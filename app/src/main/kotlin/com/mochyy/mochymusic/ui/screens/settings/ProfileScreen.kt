@@ -573,7 +573,7 @@ fun ProfileScreen(navController: NavController) {
                     ) {
                         // greeting (in the header; its scrolled-away twin lives in the top bar); on its side it heads the cards at the right
                         if (!landscape) Text(
-                            text = "${MusifyGreeting.current}, ${accountName.ifBlank { "there" }}!",
+                            text = "${MochyGreeting.current}, ${accountName.ifBlank { "there" }}!",
                             style = PageTitle,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -768,7 +768,7 @@ fun ProfileScreen(navController: NavController) {
                         if (landscape) {
                             Spacer(Modifier.height(statusBarTop + 30.dp))
                             Text(
-                                text = "${MusifyGreeting.current}, ${accountName.ifBlank { "there" }}!",
+                                text = "${MochyGreeting.current}, ${accountName.ifBlank { "there" }}!",
                                 style = PageTitle,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -859,7 +859,7 @@ fun ProfileScreen(navController: NavController) {
             )
             if (collapseProgress > 0.01f) {
                 Text(
-                    text = "${MusifyGreeting.current}, ${accountName.ifBlank { "there" }}!",
+                    text = "${MochyGreeting.current}, ${accountName.ifBlank { "there" }}!",
                     style = PageTitle.copy(fontSize = 18.sp),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
