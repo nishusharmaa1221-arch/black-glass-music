@@ -79,6 +79,9 @@ adb shell settings put global window_animation_scale 0
 adb shell settings put global transition_animation_scale 0
 adb shell settings put global animator_duration_scale 0
 adb shell settings put system screen_off_timeout 600000
+# the full player is immersive; pre-confirm it so SystemUI never shows the
+# blue "Viewing full screen" hint card over the player (run 9 flaw)
+adb shell settings put secure immersive_mode_confirmations "$PKG" 2>/dev/null || true
 
 log "installing $APK_PATH"
 adb install -g -r "$APK_PATH" || { log "INSTALL FAILED"; exit 1; }
@@ -296,10 +299,23 @@ if has "$SONG_TITLE" && ! has "Import progress"; then
     dump || true
   fi
   shot player-open
-  shot now-playing-1
-  adb shell dumpsys media_session 2>/dev/null | grep -a "PlaybackState" | head -3 || true
-  sleep 4
-  shot now-playing-2
+  # If the immersive hint still appeared, dismiss it; then restart the track
+  # with the player's Previous button (single-song queue = back to 0:00) so
+  # the money shots land safely mid-track with a moving seekbar.
+  dump || true
+  if has "Got it"; then tap_find "Got it" --exact || true; sleep 1; fi
+  if player_expanded; then
+    adb shell input tap 231 1912   # Previous / restart
+    sleep 3
+    shot now-playing-1
+    adb shell dumpsys media_session 2>/dev/null | grep -a "PlaybackState" | head -3 || true
+    sleep 4
+    shot now-playing-2
+  else
+    shot now-playing-1
+    sleep 4
+    shot now-playing-2
+  fi
 else
   log "WARNING: song not found in library UI (or progress sheet stuck)"
   debug_snap
