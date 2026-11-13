@@ -59,6 +59,8 @@ def main():
                 cls = args[i + 1]
             if a == "--index" and i + 1 < len(args):
                 idx = int(args[i + 1])
+            if a == "--last":
+                idx = -1
         attr = "content-desc" if use_desc else "text"
         hits = []
         for el in nodes(root):
@@ -71,6 +73,9 @@ def main():
                 c = parse_bounds(el.get("bounds"))
                 if c:
                     hits.append(c)
+        if idx == -1 and hits:
+            print(f"{hits[-1][0]} {hits[-1][1]}")
+            return 0
         if len(hits) > idx:
             print(f"{hits[idx][0]} {hits[idx][1]}")
             return 0

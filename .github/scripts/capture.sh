@@ -122,8 +122,15 @@ fi
 debug_snap
 
 # ------------------------------------------------------- setup wizard
+in_main_ui() {
+  has "Try something new" || has_desc "Your Library" || has_desc "Profile"
+}
 for i in $(seq 1 16); do
   dump || true
+  if in_main_ui; then
+    log "main UI reached (wizard done)"
+    break
+  fi
   if has "what's your username"; then
     log "profile page: setting username"
     shot wizard-profile
@@ -150,11 +157,6 @@ for i in $(seq 1 16); do
     tap_find "Done" --exact || true
     sleep 3
   else
-    # no wizard controls visible — maybe we've reached the main UI
-    if has "Library" || has "$SONG_TITLE"; then
-      log "looks like main UI reached"
-      break
-    fi
     log "wizard loop: unknown screen, snapshotting"
     debug_snap
     sleep 3
@@ -163,19 +165,36 @@ done
 debug_snap
 shot home-first
 
+ensure_app_fg() {
+  local focus
+  focus=$(adb shell dumpsys window 2>/dev/null | grep -m1 "mCurrentFocus" || true)
+  case "$focus" in
+    *"$PKG"*) : ;;
+    *)
+      log "app not in foreground ($focus) - relaunching"
+      adb shell am start -n $PKG/.MainActivity >/dev/null 2>&1
+      sleep 5
+      ;;
+  esac
+}
+
+goto_library() {
+  ensure_app_fg
+  dump || true
+  tap_find "Your Library" --desc || tap_find "Library" || adb shell input tap 654 2232
+  sleep 3
+}
+
 # ------------------------------------------------------- library & play
-# Try the Library tab (bottom nav text or desc)
+goto_library
 dump || true
-tap_find "Library" || tap_find "Library" --desc || true
-sleep 3
-dump || true
+# Local device songs live under the "Local" filter chip, not in "All"
 if ! has "$SONG_TITLE"; then
-  tap_find "Songs" || true
-  sleep 2
+  tap_find "Local" --exact || true
+  sleep 3
   dump || true
 fi
 shot library
-# scroll a bit if the song is not visible
 if ! has "$SONG_TITLE"; then
   adb shell input swipe 540 1700 540 800 400
   sleep 2
@@ -189,16 +208,15 @@ if has "$SONG_TITLE"; then
   sleep 3
   dump || true
   shot after-tap-song
-  adb shell dumpsys media_session 2>/dev/null | grep -E "state=PlaybackState|position" | head -4 || true
-  # open full player: tap the mini-player (song title in the bar, 2nd match)
-  tap_find "$SONG_TITLE" --index 1 || tap_find "$SONG_TITLE" || true
+  adb shell dumpsys media_session 2>/dev/null | grep -a "PlaybackState\|position" | head -4 || true
+  # open full player: tap the mini-player (song title's LAST match = the bar)
+  tap_find "$SONG_TITLE" --last || true
   sleep 3
   dump || true
   shot player-open
-  sleep 4
+  sleep 3
   shot now-playing-1
-  adb shell dumpsys media_session 2>/dev/null | grep -E "state=PlaybackState" | head -3 || true
-  sleep 5
+  sleep 4
   shot now-playing-2
 else
   log "WARNING: song not found in library UI"
@@ -206,38 +224,56 @@ else
 fi
 
 # ------------------------------------------------------------- profile
-adb shell input keyevent 4   # close player if open
+ensure_app_fg
+adb shell input keyevent 4   # collapse full player (once only!)
 sleep 2
-adb shell input keyevent 4
-sleep 2
+ensure_app_fg
 dump || true
-tap_find "Settings" || tap_find "Settings" --desc || true
+# Bottom-nav 4th tab (M icon) opens the Profile screen; top avatar works too
+if ! tap_find "Settings" --desc; then
+  if ! tap_find "Profile" --desc; then
+    adb shell input tap 884 2232
+  fi
+fi
 sleep 3
 dump || true
 shot profile
+texts > "$OUT/profile-texts.txt" 2>/dev/null || true
 
 # ------------------------------------------------------------ audio lab
-if has "Audio Lab"; then
-  tap_find "Audio Lab" || true
-else
-  # profile screen may need a scroll, or a settings-list entry point
-  adb shell input swipe 540 1800 540 700 400
-  sleep 2
+ensure_app_fg
+open_audio_lab() {
   dump || true
-  if has "Audio Lab"; then
-    tap_find "Audio Lab" || true
-  elif has "Equalizer"; then
-    tap_find "Equalizer" || true
-  elif has "Settings"; then
-    tap_find "Settings" || true
-    sleep 2
+  if has "Audio Lab"; then tap_find "Audio Lab" && return 0; fi
+  if has "Equalizer"; then tap_find "Equalizer" && return 0; fi
+  return 1
+}
+if ! open_audio_lab; then
+  # look for a route into the full settings list, then use its search
+  tap_find "All settings" || tap_find "Settings" || true
+  sleep 2
+  if ! open_audio_lab; then
     dump || true
-    tap_find "Audio Lab" || tap_find "Equalizer" || true
+    if has "Search settings"; then
+      tap_find "Search settings" || tap_field 0 || true
+      sleep 1
+      adb shell input text "Audio Lab"
+      sleep 2
+      dump || true
+      tap_find "Audio Lab" || tap_find "Equalizer" || true
+    else
+      for s in 1 2 3; do
+        adb shell input swipe 540 1800 540 700 400
+        sleep 1
+        if open_audio_lab; then break; fi
+      done
+    fi
   fi
 fi
 sleep 3
 dump || true
 shot audiolab
+texts > "$OUT/audiolab-texts.txt" 2>/dev/null || true
 debug_snap
 
 log "capture script finished"
