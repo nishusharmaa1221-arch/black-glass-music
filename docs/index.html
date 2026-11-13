@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mochy Music</title>
+<meta name="description" content="Mochy Music: a free music player for Android with style. Player styles, synced lyrics, an audio lab, imports from your streaming apps, and modules to make it yours.">
+<meta name="theme-color" content="#0e0e0f">
+<meta property="og:title" content="Mochy Music">
+<meta property="og:description" content="Music, with style <3. Free, forever.">
+<meta property="og:image" content="assets/img/mochy-hero.webp">
+<link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&display=swap">
+<!-- fira code for the ring only, cut down to just its letters so it weighs a couple of kb -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@600&display=swap&text=MOCHYUSI%E2%80%A2%20">
+<!-- bump ?v= on the css and js links whenever they change, or browsers keep showing the old copy for up to 10 minutes -->
+<link rel="stylesheet" href="assets/css/site.css?v=20261111a">
+<link rel="stylesheet" href="assets/css/home.css?v=20261107k">
+<link rel="preload" as="image" href="assets/img/mochy-hero.webp" type="image/webp">
+<script>document.documentElement.classList.add("js");</script>
+</head>
+<body class="dots home-page">
+
+<header class="topnav" id="topnav">
+  <nav class="wrap nav" aria-label="Main">
+    <div class="brand"><a class="brand-name" href="./" style="text-decoration:none"><img src="assets/img/logo.svg" alt="" width="32" height="35">Mochy Music</a><span class="brand-sep"></span><a class="brand-sub" href="https://github.com/realidkroo/Mochy-Music">GITHUB</a></div>
+    <button class="nav-toggle press" type="button" aria-label="Menu" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <div class="nav-links">
+      <a href="wiki/#roadmap">Roadmaps</a><span></span>
+      <a href="wiki/">Docs</a><span></span>
+      <a href="https://discord.gg/NTmqVphbRY">Community</a><span></span>
+      <a href="https://github.com/realidkroo/Mochy-Music/releases">Download</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+<div class="stack">
+
+  <section class="scene dots hero" aria-label="Mochy Music">
+    <div class="scene-body">
+      <div class="ghost" aria-hidden="true">
+        <div class="ghost-row to-right"><span>MOCHY</span><span>MOCHY</span><span>MOCHY</span><span>MOCHY</span></div>
+        <div class="ghost-row to-left"><span>MUSIC</span><span>MUSIC</span><span>MUSIC</span><span>MUSIC</span></div>
+      </div>
+      <div class="ring-wrap" aria-hidden="true">
+        <svg class="ring" viewBox="0 0 1000 1000">
+          <defs><path id="ringPath" d="M500,500 m-377,0 a377,377 0 1,1 754,0 a377,377 0 1,1 -754,0"/></defs>
+          <circle cx="500" cy="500" r="400"/>
+          <text><textPath href="#ringPath" textLength="2360" lengthAdjust="spacing">MOCHY MUSIC • MOCHY MUSIC • MOCHY MUSIC • MOCHY MUSIC • </textPath></text>
+        </svg>
+      </div>
+      <div class="wrap scene-grid">
+        <div class="hero-copy">
+          <h1><span class="w">Music</span><span class="s">With style &lt;3</span></h1>
+          <div class="cta">
+            <a class="pill press" href="https://github.com/realidkroo/Mochy-Music/releases"><i><svg class="line" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5v11M7 11l5 5 5-5M5.5 19.5h13"/></svg></i>Download Now</a>
+            <a class="pill press" href="https://discord.gg/NTmqVphbRY"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg></i>Join Discord</a>
+          </div>
+        </div>
+      </div>
+      <div class="mascot-wrap" aria-hidden="true"><img class="mascot" src="assets/img/mochy-hero.webp" alt="" width="1095" height="1858" fetchpriority="high"></div>
+      <div class="cue" aria-hidden="true">scroll<i></i></div>
+    </div>
+  </section>
+
+  <section class="scene dots">
+    <div class="scene-body">
+      <div class="wrap scene-grid">
+        <div class="words">
+          <h2 class="big l">In app<br>integrations</h2>
+          <p class="lead">Take your music from your favourite streaming apps.</p>
+        </div>
+      </div>
+      <div class="art">
+        <div class="slot cut"><div class="phone tilt"><img src="assets/img/app-library.webp" alt="Mochy's library, with imports from Spotify, YouTube, Apple Music and Tidal" width="450" height="1000" decoding="async" fetchpriority="low"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="scene dots flip">
+    <div class="scene-body">
+      <div class="wrap scene-grid">
+        <div class="words right">
+          <h2 class="big l">Sleek,<br>Customisable</h2>
+          <p class="lead">Use a built-in style, or build your own style.</p>
+        </div>
+      </div>
+      <div class="art duo left">
+        <div class="slot a"><div class="phone tilt"><img src="assets/img/app-player.webp" alt="The flagship player" width="450" height="1000" decoding="async" fetchpriority="low"></div></div>
+        <div class="slot b"><div class="phone tilt"><img src="assets/img/app-styles.webp" alt="Picking a player style" width="450" height="1000" decoding="async" fetchpriority="low"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="scene dots">
+    <div class="scene-body">
+      <div class="wrap scene-grid">
+        <div class="words">
+          <h2 class="big l">Replay it. look<br>at the past.</h2>
+          <p class="lead">See your listening activity in the app.</p>
+        </div>
+      </div>
+      <div class="art duo right">
+        <div class="slot a"><div class="phone tilt"><img src="assets/img/app-stats.webp" alt="Listening stats" width="450" height="1000" decoding="async" fetchpriority="low"></div></div>
+        <div class="slot b"><div class="phone tilt"><img src="assets/img/app-recap.webp" alt="The recap" width="450" height="1000" decoding="async" fetchpriority="low"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="rail dots" aria-label="More in Mochy">
+    <div class="rail-pin">
+      <div class="wrap rail-head">
+        <h2 class="big l">There's more<br>in there</h2>
+        <p class="lead">Keep scrolling, it slides.</p>
+      </div>
+      <div class="rail-track">
+        <a class="card press" href="wiki/#app-lyrics"><h3>Lyrics that sing along</h3><p>Word by word, from a bunch of sources, and they follow the music video too.</p><div class="phone"><img src="assets/img/app-lyrics.webp" alt="Synced lyrics" width="450" height="1000" decoding="async" fetchpriority="low"></div></a>
+        <a class="card press" href="wiki/#app-audio"><h3>An audio lab in your pocket</h3><p>Equalizer, effects, crossfade, lossless when a module has it.</p><div class="phone"><img src="assets/img/app-audiolab.webp" alt="Audio Lab" width="450" height="1000" decoding="async" fetchpriority="low"></div></a>
+        <a class="card press" href="wiki/#modules-types"><h3>Make it yours, with modules</h3><p>Looks, liquid glass, your own player, new sources. Anyone can make one.</p><div class="phone"><img src="assets/img/app-modules2.webp" alt="The modules page" width="450" height="1000" decoding="async" fetchpriority="low"></div></a>
+        <a class="card press" href="wiki/#app-home"><h3>Search everything</h3><p>Moods, genres, songs, albums, artists, playlists and videos.</p><div class="phone"><img src="assets/img/app-search.webp" alt="Search" width="450" height="1000" decoding="async" fetchpriority="low"></div></a>
+        <a class="card press" href="wiki/#app-settings"><h3>Easy on your data</h3><p>Data saver plays lighter streams and keeps covers still on mobile data.</p><div class="phone"><img src="assets/img/app-behaviour.webp" alt="App behaviour and data saver" width="450" height="1000" decoding="async" fetchpriority="low"></div></a>
+        <a class="card press" href="wiki/#app-settings"><h3>Every setting, one search away</h3><p>Type any setting and it takes you right to it.</p><div class="phone"><img src="assets/img/app-settings.webp" alt="Settings" width="450" height="1000" decoding="async" fetchpriority="low"></div></a>
+        <a class="card end press" href="wiki/"><h3>Read the docs</h3><p>How every part of Mochy works, and how to make your own modules.</p></a>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<section class="wrap tour-scene">
+  <div class="reveal">
+    <h2 class="big l">Take a<br>quick tour</h2>
+    <p class="lead">Tap the bar, it works like the one in the app.</p>
+  </div>
+  <div class="tour reveal">
+    <div class="phone">
+      <img class="on" src="assets/img/app-home.webp" alt="Home" width="450" height="1000" decoding="async" fetchpriority="low">
+      <img data-src="assets/img/app-search.webp" alt="Search" width="450" height="1000">
+      <img data-src="assets/img/app-library.webp" alt="Library" width="450" height="1000">
+      <img data-src="assets/img/app-profile.webp" alt="Profile and settings" width="450" height="1000">
+    </div>
+    <div class="navbar" role="tablist" aria-label="App pages">
+      <span class="hl" style="left:10px"></span>
+      <button class="on press" type="button" aria-label="Home" data-caption="Home: what you play, picked for you"><svg viewBox="0 0 24 24"><path d="M4 11.5 12 5l8 6.5V20h-5v-5H9v5H4z"/></svg></button>
+      <button class="press" type="button" aria-label="Search" data-caption="Search: moods, genres, everything"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5"/></svg></button>
+      <button class="press" type="button" aria-label="Library" data-caption="Library: yours, local, cached and imported"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="3"/><path d="M10 15.5a1.5 1.5 0 1 1-1.5-1.5H10V9h4"/></svg></button>
+      <button class="press" type="button" aria-label="Profile" data-caption="Profile: your stats, and every setting"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"/></svg></button>
+    </div>
+    <div class="tour-caption">Home: what you play, picked for you</div>
+  </div>
+</section>
+
+<section class="contact">
+  <div class="wrap reveal">
+    <h2>Get in touch with the dev</h2>
+    <a class="pill white press" href="https://discord.gg/NTmqVphbRY">Say hi on Mochy's Bar</a>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-grid">
+    <div>
+      <span class="brand-name"><img src="assets/img/logo.svg" alt="" width="32" height="35">Mochy Music</span>
+      <small>not affiliated by google, apple, or other.</small>
+      <div class="year">2026</div>
+    </div>
+    <nav aria-label="Footer">
+      <a href="wiki/">Docs</a>
+      <a href="https://github.com/realidkroo/Mochy-Music">Github</a>
+      <a href="https://discord.gg/NTmqVphbRY">Join discord</a>
+      <a href="https://github.com/realidkroo/Mochy-Music/releases">Download now</a>
+    </nav>
+  </div>
+</footer>
+
+<script src="assets/js/site.js?v=20261107g" defer></script>
+<script src="assets/js/home.js?v=20261107k" defer></script>
+</body>
+</html>
