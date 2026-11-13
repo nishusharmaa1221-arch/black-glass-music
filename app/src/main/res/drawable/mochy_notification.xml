@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- the notification icon, the Musify M mark; android only reads its alpha -->
+<!-- the notification icon, the Musify M mark filled; android only reads its alpha -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
@@ -10,9 +10,6 @@
         android:translateY="-48">
         <path
             android:pathData="M66 174V62H90L118 118L146 62H170V174H146V126L118 148L90 126V174Z"
-            android:fillColor="#00000000"
-            android:strokeColor="#FFFFFF"
-            android:strokeWidth="19"
-            android:strokeLineJoin="round" />
+            android:fillColor="#FFFFFF" />
     </group>
 </vector>

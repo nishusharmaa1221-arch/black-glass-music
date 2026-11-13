@@ -12,8 +12,11 @@
 
 package com.mochyy.mochymusic.ui.launch
 
+import com.mochyy.mochymusic.R
+
 import android.content.Context
 import android.util.Patterns
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -53,6 +56,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -319,7 +323,11 @@ fun BlackGlassLoginScreen(
                     .background(Color(0x14D4AF37)),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(text = "♪", color = Gold, fontSize = 40.sp, fontWeight = FontWeight.Bold)
+                Image(
+                    painter = painterResource(R.drawable.ic_launcher_m),
+                    contentDescription = null,
+                    modifier = Modifier.size(46.dp),
+                )
             }
             Spacer(Modifier.height(16.dp))
             Text(
