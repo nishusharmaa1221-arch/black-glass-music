@@ -111,7 +111,7 @@
     <string name="customise_icons_caption">Your home screen can take a few seconds to show the new icon. Opening Musify from it starts from that icon too.</string>
     <string name="app_icon_family_mark">Musify</string>
     <string name="app_icon_family_outline">Musify Mono</string>
-    <string name="app_icon_family_anime">Sheru</string>
+    <string name="app_icon_family_anime">Musify Glow</string>
     <string name="app_icon_default">Default</string>
     <string name="app_icon_white">White</string>
     <string name="app_icon_black">Black</string>
@@ -122,10 +122,10 @@
     <string name="app_icon_outline_black">Black</string>
     <string name="app_icon_outline_material">Material u</string>
     <string name="app_icon_outline_transparent">Transparent</string>
-    <string name="app_icon_anime_white">Sheru white</string>
-    <string name="app_icon_anime_dark">Sheru dark</string>
-    <string name="app_icon_anime_material">Sheru material u</string>
-    <string name="app_icon_anime_transparent">Sheru transparent</string>
+    <string name="app_icon_anime_white">Musify white</string>
+    <string name="app_icon_anime_dark">Musify dark</string>
+    <string name="app_icon_anime_material">Musify material u</string>
+    <string name="app_icon_anime_transparent">Musify transparent</string>
     <string name="customise_icons_show_all">Show all icons</string>
     <string name="customise_icons_show_less">Show fewer icons</string>
     <string name="app_icon_customize">Customize</string>
