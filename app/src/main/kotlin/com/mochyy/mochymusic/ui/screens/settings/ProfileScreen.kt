@@ -795,9 +795,9 @@ fun ProfileScreen(navController: NavController) {
                             },
                         )
                         Spacer(Modifier.height(16.dp))
-                        DeveloperCard(onClick = { navController.navigate("developer_space") })
+                        InstaFollowCard(handle = "@nirbhay__07_20", onClick = { context.openDevUrl("https://www.instagram.com/nirbhay__07_20") })
                         Spacer(Modifier.height(16.dp))
-                        DiscordCard(onClick = { context.openDevUrl(DiscordUrl) })
+                        InstaFollowCard(handle = "@shanir.ai", onClick = { context.openDevUrl("https://www.instagram.com/shanir.ai") })
                         Spacer(Modifier.height(28.dp))
                         Text("Settings", style = PageTitle.copy(fontSize = 15.sp), modifier = Modifier.padding(start = 2.dp, bottom = 10.dp))
                         OpenSettingsRow(onClick = { navController.navigate("mochy_settings") })
@@ -1176,49 +1176,7 @@ private fun VersionCapsule(update: Boolean, onAbout: () -> Unit) {
 }
 
 @Composable
-private fun DeveloperCard(onClick: () -> Unit) {
-    val interaction = remember { MutableInteractionSource() }
-    val pressed by interaction.collectIsPressedAsState()
-    val spread by animateFloatAsState(
-        targetValue = if (pressed) 1f else 0f,
-        animationSpec = spring(dampingRatio = 0.55f, stiffness = 420f),
-        label = "devCardSpread",
-    )
-    val face = 30.dp
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(22.dp))
-            .background(PageCard)
-            .clickable(interactionSource = interaction, indication = RemoteFocus, onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-    ) {
-        // room for every face at rest, 40% of a face apart; pressed they spill to the right
-        Box(Modifier.size(width = face + face * 0.4f * (DevPeople.size - 1), height = face)) {
-            DevPeople.forEachIndexed { i, person ->
-                DevAvatar(
-                    person,
-                    Modifier
-                        .size(face)
-                        .graphicsLayer { translationX = i * face.toPx() * (0.4f + 0.35f * spread) }
-                        .border(1.5.dp, PageCard, CircleShape),
-                )
-            }
-        }
-        Spacer(Modifier.width(12.dp))
-        Text(
-            "meet da dev and contributors :3",
-            style = TextStyle(fontFamily = InterFontFamily, fontWeight = FontWeight.Bold, fontSize = 15.sp, letterSpacing = (-0.6).sp, color = Color(0xFF9A9A9A)),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f),
-        )
-    }
-}
-
-@Composable
-private fun DiscordCard(onClick: () -> Unit) {
+private fun InstaFollowCard(handle: String, onClick: () -> Unit) {
     val face = 30.dp
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -1229,23 +1187,34 @@ private fun DiscordCard(onClick: () -> Unit) {
             .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
-        Image(
-            painter = rememberResourcePainter(R.drawable.mochy_discord),
-            contentDescription = "Discord",
-            contentScale = ContentScale.Crop,
+        Box(
+            contentAlignment = Alignment.Center,
             modifier = Modifier
                 .size(face)
                 .clip(CircleShape)
-                .background(Color.White),
-        )
+                .background(Color(0xFFD4AF37)),
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_instagram),
+                contentDescription = "Instagram",
+                tint = Color.Unspecified,
+                modifier = Modifier.size(18.dp),
+            )
+        }
         Spacer(Modifier.width(12.dp))
-        Text(
-            "Join mochy’s discord server!",
-            style = TextStyle(fontFamily = InterFontFamily, fontWeight = FontWeight.Bold, fontSize = 15.sp, letterSpacing = (-0.6).sp, color = Color.White),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f),
-        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                "Follow us",
+                style = TextStyle(fontFamily = InterFontFamily, fontWeight = FontWeight.Bold, fontSize = 15.sp, letterSpacing = (-0.6).sp, color = Color.White),
+                maxLines = 1,
+            )
+            Text(
+                handle,
+                style = TextStyle(fontFamily = InterFontFamily, fontSize = 12.sp, color = Color(0xFF9A9A9A)),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
     }
 }
 
