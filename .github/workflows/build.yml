@@ -35,7 +35,7 @@ jobs:
       - name: Build FOSS debug APK
         run: |
           chmod +x gradlew
-          ./gradlew assembleArm64FossDebug --stacktrace
+          ./gradlew assembleArm64FossRelease --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
