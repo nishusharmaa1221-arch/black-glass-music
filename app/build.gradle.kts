@@ -11,7 +11,7 @@ if (localPropertiesFile.exists()) {
 }
 plugins {
     id("com.android.application")
-    id("com.google.gms.google-services") version "4.4.3"
+    id("com.google.gms.google-services")
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.compose.compiler)
