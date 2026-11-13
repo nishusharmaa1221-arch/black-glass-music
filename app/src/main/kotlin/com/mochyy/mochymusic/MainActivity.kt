@@ -617,13 +617,53 @@ class MainActivity : ComponentActivity() {
                 com.mochyy.mochymusic.ui.launch.BlackGlassAuth.isLoggedIn(context)
             )
         }
+        // Moderation check on a RESTORED session (v1.2.0): if Firebase still
+        // has a user, verify his users/{uid} record once before entering.
+        // Fail-open — the check only blocks on an explicit moderation state.
+        var bgModChecked by remember { mutableStateOf(!bgLoggedIn) }
+        var bgModNotice by remember { mutableStateOf<String?>(null) }
+        if (bgLoggedIn && !bgModChecked) {
+            LaunchedEffect(Unit) {
+                val user = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
+                if (user == null) {
+                    bgModChecked = true
+                } else {
+                    com.mochyy.mochymusic.ui.launch.BlackGlassModeration.check(user) { res ->
+                        when (res) {
+                            is com.mochyy.mochymusic.ui.launch.BlackGlassModeration.Result.Allowed ->
+                                bgModChecked = true
+                            is com.mochyy.mochymusic.ui.launch.BlackGlassModeration.Result.Blocked -> {
+                                bgModNotice = res.message
+                                bgLoggedIn = false
+                                bgModChecked = true
+                            }
+                        }
+                    }
+                }
+            }
+            MochyTheme(
+                darkTheme = useDarkTheme,
+                pureBlack = pureBlack,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black),
+                    contentAlignment = androidx.compose.ui.Alignment.Center,
+                ) {
+                    Text("Musify", color = Color(0xFFD4AF37), fontSize = 22.sp)
+                }
+            }
+            return
+        }
         if (!bgLoggedIn) {
             MochyTheme(
                 darkTheme = useDarkTheme,
                 pureBlack = pureBlack,
             ) {
                 com.mochyy.mochymusic.ui.launch.BlackGlassLoginScreen(
-                    onLoggedIn = { bgLoggedIn = true }
+                    onLoggedIn = { bgLoggedIn = true },
+                    notice = bgModNotice,
                 )
             }
             return

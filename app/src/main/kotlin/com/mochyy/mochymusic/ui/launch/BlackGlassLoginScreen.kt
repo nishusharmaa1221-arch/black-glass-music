@@ -74,6 +74,8 @@ import android.os.Looper
 import java.net.HttpURLConnection
 import java.net.URL
 import java.time.Instant
+import org.json.JSONObject
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
@@ -138,9 +140,101 @@ private fun firestoreRequest(method: String, urlStr: String, token: String?, bod
     }
 }
 
+private fun firestoreGetBody(urlStr: String, token: String?): Pair<Int, String> {
+    val conn = URL(urlStr).openConnection() as HttpURLConnection
+    try {
+        conn.requestMethod = "GET"
+        conn.connectTimeout = 15000
+        conn.readTimeout = 15000
+        if (token != null) conn.setRequestProperty("Authorization", "Bearer $token")
+        val code = conn.responseCode
+        val stream = if (code in 200..299) conn.inputStream else conn.errorStream
+        val text = stream?.bufferedReader()?.use { it.readText() } ?: ""
+        return code to text
+    } finally {
+        conn.disconnect()
+    }
+}
+
+// ---- Moderation enforcement (v1.2.0) ----
+// The admin panel sets moderation fields on the user's own users/{uid}
+// record: status ("banned" | "suspended"), suspendedUntil, deleteRequested.
+// After a successful sign-in AND on a restored session, the app reads its
+// own record over Firestore REST and honours those fields BEFORE entering:
+// - deleteRequested -> delete own record, then delete own Auth account
+//   (Identity Toolkit accounts:delete with the user's own ID token),
+//   sign out, message "Aapka account delete kar diya gaya hai."
+// - banned -> sign out, "Ye account ban kar diya gaya hai."
+// - suspended with suspendedUntil in the future -> sign out,
+//   "Aapka account <date IST> tak suspend hai." A lapsed date = active.
+// FAIL-OPEN by design: missing doc, missing fields or ANY error = allowed,
+// so a failed check never disturbs existing users.
+object BlackGlassModeration {
+
+    sealed interface Result {
+        data object Allowed : Result
+        data class Blocked(val message: String) : Result
+    }
+
+    fun check(user: com.google.firebase.auth.FirebaseUser, onResult: (Result) -> Unit) {
+        Thread {
+            val result = runCatching { checkSync(user) }.getOrElse { Result.Allowed }
+            Handler(Looper.getMainLooper()).post { onResult(result) }
+        }.start()
+    }
+
+    private fun checkSync(user: com.google.firebase.auth.FirebaseUser): Result {
+        val token = runCatching { Tasks.await(user.getIdToken(false)).token }.getOrNull()
+            ?: return Result.Allowed
+        val uid = user.uid
+        val (code, text) = firestoreGetBody("$FirestoreBase/users/$uid", token)
+        if (code != 200) return Result.Allowed
+        val fields = runCatching { JSONObject(text).getJSONObject("fields") }.getOrNull()
+            ?: return Result.Allowed
+
+        val deleteRequested =
+            fields.optJSONObject("deleteRequested")?.optBoolean("booleanValue") == true
+        if (deleteRequested) {
+            runCatching { firestoreRequest("DELETE", "$FirestoreBase/users/$uid", token, null) }
+            runCatching {
+                val apiKey = com.google.firebase.FirebaseApp.getInstance().options.apiKey
+                val body = JSONObject().put("idToken", token).toString()
+                firestoreRequest(
+                    "POST",
+                    "https://identitytoolkit.googleapis.com/v1/accounts:delete?key=$apiKey",
+                    null,
+                    body,
+                )
+            }
+            BlackGlassAuth.signOut()
+            return Result.Blocked("Aapka account delete kar diya gaya hai.")
+        }
+
+        val status = fields.optJSONObject("status")?.optString("stringValue")
+        if (status == "banned") {
+            BlackGlassAuth.signOut()
+            return Result.Blocked("Ye account ban kar diya gaya hai.")
+        }
+        if (status == "suspended") {
+            val untilStr = fields.optJSONObject("suspendedUntil")?.optString("timestampValue")
+            val until = untilStr?.let { runCatching { Instant.parse(it) }.getOrNull() }
+            if (until != null && until.isAfter(Instant.now())) {
+                BlackGlassAuth.signOut()
+                val dateStr = java.time.format.DateTimeFormatter
+                    .ofPattern("d MMM yyyy", java.util.Locale.ENGLISH)
+                    .withZone(java.time.ZoneId.of("Asia/Kolkata"))
+                    .format(until)
+                return Result.Blocked("Aapka account $dateStr tak suspend hai.")
+            }
+        }
+        return Result.Allowed
+    }
+}
+
 @Composable
 fun BlackGlassLoginScreen(
     onLoggedIn: () -> Unit,
+    notice: String? = null,
 ) {
     val context = LocalContext.current
     val auth = remember { FirebaseAuth.getInstance() }
@@ -152,7 +246,7 @@ fun BlackGlassLoginScreen(
     var confirmVisible by remember { mutableStateOf(false) }
     var passwordVisible by remember { mutableStateOf(false) }
     var loading by remember { mutableStateOf(false) }
-    var error by remember { mutableStateOf<String?>(null) }
+    var error by remember { mutableStateOf(notice) }
     var info by remember { mutableStateOf<String?>(null) }
 
     fun fail(msg: String) {
@@ -175,7 +269,20 @@ fun BlackGlassLoginScreen(
         error = null
         info = null
         auth.signInWithEmailAndPassword(em, password)
-            .addOnSuccessListener { onLoggedIn() }
+            .addOnSuccessListener { result ->
+                val user = result.user
+                if (user == null) {
+                    onLoggedIn()
+                    return@addOnSuccessListener
+                }
+                // Moderation check before entering (v1.2.0) — fail-open.
+                BlackGlassModeration.check(user) { res ->
+                    when (res) {
+                        is BlackGlassModeration.Result.Allowed -> onLoggedIn()
+                        is BlackGlassModeration.Result.Blocked -> fail(res.message)
+                    }
+                }
+            }
             .addOnFailureListener { e -> fail(authErrorMessage(e, createMode = false)) }
     }
 
