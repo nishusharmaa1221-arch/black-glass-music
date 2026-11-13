@@ -269,46 +269,20 @@ if has "$SONG_TITLE" && ! has "Import progress"; then
   # old detector keyed on a "Your Library" desc that this screen doesn't
   # have, so it reported "expanded" instantly. Fixed coords below come from
   # the run 7/8 screenshots (mini bar y~2050, title x~490, artwork x~140).
-  # Expanded test on the CURRENT dump: the full player is the only play-phase
-  # surface with a lyrics card. (Run 11 proved the seekbar clock is NOT a
-  # text node — canvas-drawn — and the list stays in the tree behind the
-  # sheet, so the old time-node/"Local" tests never fired and wasted ~10s.)
-  player_expanded() { has "No lyrics" || has "Lyrics"; }
-  # Emulator playback runs FASTER than realtime (~1.4x, no audio device):
-  # expand FAST and shoot immediately. Run 11's expand-a proved attempt A
-  # (tap on the mini-player body) opens the player at once (~0:07).
-  # A: tap the mini-player body
+  # Deterministic sequence — no state detectors (three detector designs all
+  # failed: the seekbar clock is canvas-drawn, the list stays in the tree
+  # behind the sheet, the lyrics card composes late). Proven facts from
+  # runs 9-12: tapping the mini-player body opens the full player at once;
+  # the blue immersive banner auto-dismisses within seconds; playback raced
+  # at ~1.4x under -noaudio (workflow now keeps a virtual audio device).
   adb shell input tap 490 2043
   sleep 2
-  dump || true
-  shot expand-a
-  if ! player_expanded; then
-    # B: upward drag on the mini bar ("open with your finger")
-    adb shell input swipe 540 2050 540 900 450
-    sleep 2
-    dump || true
-    shot expand-b
-  fi
-  if ! player_expanded; then
-    # C: tap the mini-player artwork
-    adb shell input tap 140 2050
-    sleep 2
-    dump || true
-    shot expand-c
-  fi
-  if ! player_expanded; then
-    # D: tap the playing row again
-    tap_find "$SONG_TITLE" || true
-    sleep 2
-    dump || true
-    shot expand-d
-  fi
   shot player-open
-  # If the immersive hint still appeared despite the pre-confirm, dismiss it
+  dump || true
   if has "Got it"; then tap_find "Got it" --exact || true; sleep 1; fi
   shot now-playing-1
   adb shell dumpsys media_session 2>/dev/null | grep -a "PlaybackState" | head -3 || true
-  sleep 3
+  sleep 4
   shot now-playing-2
 else
   log "WARNING: song not found in library UI (or progress sheet stuck)"

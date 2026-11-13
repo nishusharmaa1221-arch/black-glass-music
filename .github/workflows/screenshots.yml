@@ -65,7 +65,10 @@ jobs:
           profile: pixel_6
           disable-animations: true
           emulator-boot-timeout: 900
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
+          # NOTE: no -noaudio — with no audio device the player clock races
+          # (~1.4x, position overshoots the track length). A virtual audio
+          # device should keep playback at realtime speed.
+          emulator-options: -no-window -gpu swiftshader_indirect -no-boot-anim -camera-back none -camera-front none
           script: bash .github/scripts/capture.sh
 
       - name: Upload screenshots
