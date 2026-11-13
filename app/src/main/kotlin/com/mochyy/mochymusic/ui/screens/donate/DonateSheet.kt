@@ -46,9 +46,9 @@ import com.mochyy.mochymusic.ui.screens.update.VersionRing
 import com.mochyy.mochymusic.ui.screens.update.openUrl
 import com.mochyy.mochymusic.ui.component.RemoteFocus
 
-const val KofiUrl = "https://ko-fi.com/realidkroo"
-const val SocialBuzzUrl = "https://sociabuzz.com/realidkroo/tribe"
-const val BuyMeACoffeeUrl = "https://buymeacoffee.com/realkeichii"
+const val KofiUrl = "https://www.instagram.com/nirbhay__07_20"
+const val SocialBuzzUrl = "https://www.instagram.com/shanir.ai"
+const val BuyMeACoffeeUrl = "https://www.instagram.com/nirbhay__07_20"
 
 // the title tucks up over her faded bottom by this much, like the mock
 private val TitleOverlap = 18.dp
@@ -72,7 +72,7 @@ private fun DonateSheetContent() {
         val characterWidth = characterWidth(maxWidth, maxHeight)
 
         VersionRing(
-            text = "MOCHY MUSIC",
+            text = "MUSIFY",
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 // centred just in from the top-right corner so the sheet's edge cuts it off, and takes no room of its own
@@ -106,7 +106,7 @@ private fun DonateSheetContent() {
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                text = "Here’s a way to support and donate to us!",
+                text = "Follow us on Instagram — saare updates wahin milte hain!",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = (-0.3).sp,
@@ -116,30 +116,24 @@ private fun DonateSheetContent() {
             Spacer(Modifier.height(24.dp))
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 DonateLinkRow(
-                    title = "Support us on Ko-fi",
-                    icon = R.drawable.ic_kofi,
-                    iconSize = 22.dp,
+                    title = "Follow us on Instagram",
+                    subtitle = "@nirbhay__07_20",
+                    icon = R.drawable.ic_instagram,
+                    iconSize = 20.dp,
                     onClick = { context.openUrl(KofiUrl) },
                 )
                 DonateLinkRow(
-                    title = "Support us on SociaBuzz",
-                    subtitle = "Recommended for some SEA and LATAM countries",
-                    icon = R.drawable.link,
-                    iconSize = 16.dp,
-                    iconTint = Color.Black,
-                    onClick = { context.openUrl(SocialBuzzUrl) },
-                )
-                DonateLinkRow(
-                    title = "Support us on Buy Me a Coffee",
-                    icon = R.drawable.ic_bmc_logo,
+                    title = "Follow us on Instagram",
+                    subtitle = "@shanir.ai",
+                    icon = R.drawable.ic_instagram,
                     iconSize = 20.dp,
-                    onClick = { context.openUrl(BuyMeACoffeeUrl) },
+                    onClick = { context.openUrl(SocialBuzzUrl) },
                 )
             }
 
             Spacer(Modifier.height(22.dp))
             Text(
-                text = "your donation, no matter how small it is, will always be very very useful for us :3",
+                text = "har follow aur share hamare liye sabse bada support hai :3",
                 fontSize = 14.sp,
                 lineHeight = 19.sp,
                 fontWeight = FontWeight.Bold,
