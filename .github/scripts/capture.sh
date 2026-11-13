@@ -269,16 +269,14 @@ if has "$SONG_TITLE" && ! has "Import progress"; then
   # old detector keyed on a "Your Library" desc that this screen doesn't
   # have, so it reported "expanded" instantly. Fixed coords below come from
   # the run 7/8 screenshots (mini bar y~2050, title x~490, artwork x~140).
-  # Expanded test on the CURRENT dump: a standalone "m:ss" time node (the
-  # full player's clock) or the list's "Local" header having disappeared.
-  player_expanded() {
-    if texts | grep -qE '^T: [0-9]+:[0-9]{2}$'; then return 0; fi
-    if has "$SONG_TITLE" && ! has "Local"; then return 0; fi
-    return 1
-  }
+  # Expanded test on the CURRENT dump: the full player is the only play-phase
+  # surface with a lyrics card. (Run 11 proved the seekbar clock is NOT a
+  # text node — canvas-drawn — and the list stays in the tree behind the
+  # sheet, so the old time-node/"Local" tests never fired and wasted ~10s.)
+  player_expanded() { has "No lyrics" || has "Lyrics"; }
   # Emulator playback runs FASTER than realtime (~1.4x, no audio device):
-  # in run 10 the 0:25 track's clock showed 0:28-0:32. So: expand FAST and
-  # shoot immediately — no restart tap (it didn't restart), no extra dumps.
+  # expand FAST and shoot immediately. Run 11's expand-a proved attempt A
+  # (tap on the mini-player body) opens the player at once (~0:07).
   # A: tap the mini-player body
   adb shell input tap 490 2043
   sleep 2
