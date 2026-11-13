@@ -42,6 +42,7 @@ tap_find() { # tap_find <needle> [extra uitap args...]
 
 has() { python3 "$ROOT/.github/scripts/uitap.py" find "$UI" "$1" >/dev/null 2>&1; }
 has_desc() { python3 "$ROOT/.github/scripts/uitap.py" find "$UI" "$1" --desc >/dev/null 2>&1; }
+has_desc_exact() { python3 "$ROOT/.github/scripts/uitap.py" find "$UI" "$1" --desc --exact >/dev/null 2>&1; }
 
 tap_field() { # tap_field <index> : tap the Nth EditText on screen
   local coords
@@ -123,14 +124,12 @@ debug_snap
 
 # ------------------------------------------------------- setup wizard
 in_main_ui() {
-  has "Try something new" || has_desc "Your Library" || has_desc "Profile"
+  # EXACT descs only: the setup profile page contains "Add a profile picture",
+  # which substring-matches "Profile" and faked a main-UI hit in run 3.
+  has "Try something new" || has_desc_exact "Your Library" || has_desc_exact "Profile"
 }
 for i in $(seq 1 16); do
   dump || true
-  if in_main_ui; then
-    log "main UI reached (wizard done)"
-    break
-  fi
   if has "what's your username"; then
     log "profile page: setting username"
     shot wizard-profile
@@ -141,6 +140,9 @@ for i in $(seq 1 16); do
     dump || true
     tap_find "Next" --exact || true
     sleep 3
+  elif in_main_ui; then
+    log "main UI reached (wizard done)"
+    break
   elif has "Skip"; then
     tap_find "Skip" --exact || true
     sleep 3
