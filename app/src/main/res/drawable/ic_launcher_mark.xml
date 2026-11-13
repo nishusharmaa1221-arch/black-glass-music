@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- launcher foreground, icon new - transparent 9.svg at the size the old icon used -->
+<!-- Musify logo: original gold music-notes mark, drawn for Musify -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
@@ -7,26 +7,25 @@
     android:viewportHeight="292">
     <group
         android:translateX="28.5"
-        android:translateY="28.5">
+        android:translateY="28.5"
+        android:pivotX="117.5"
+        android:pivotY="117.5"
+        android:scaleX="0.92"
+        android:scaleY="0.92">
         <path
-            android:pathData="M163.5 96.3493C180.167 105.972 180.167 130.028 163.5 139.651L108 171.694C91.3333 181.316 70.5 169.288 70.5 150.043V85.9569C70.5 66.7119 91.3333 54.6838 108 64.3063L163.5 96.3493Z"
-            android:fillColor="#FFFFFF"
-            android:strokeColor="#212121"
-            android:strokeWidth="19"
-            android:strokeLineJoin="round" />
+            android:pathData="M90,20 L192,4 L192,46 L90,62 Z"
+            android:fillColor="#D4AF37" />
         <path
-            android:pathData="M97 112L108.5 98L120 112"
-            android:fillColor="#00000000"
-            android:strokeColor="#212121"
-            android:strokeWidth="11"
-            android:strokeLineCap="round"
-            android:strokeLineJoin="round" />
+            android:pathData="M95,56 L115,54 L115,164 L95,164 Z"
+            android:fillColor="#D4AF37" />
         <path
-            android:pathData="M110.325 125C111.871 133.439 121.868 148.704 142.944 149.92"
-            android:fillColor="#00000000"
-            android:strokeColor="#212121"
-            android:strokeWidth="11"
-            android:strokeLineCap="round"
-            android:strokeLineJoin="round" />
+            android:pathData="M171,38 L191,36 L191,144 L171,144 Z"
+            android:fillColor="#D4AF37" />
+        <path
+            android:pathData="M60,170 A24,24 0 1,0 108,170 A24,24 0 1,0 60,170 Z"
+            android:fillColor="#D4AF37" />
+        <path
+            android:pathData="M136,150 A24,24 0 1,0 184,150 A24,24 0 1,0 136,150 Z"
+            android:fillColor="#D4AF37" />
     </group>
 </vector>
