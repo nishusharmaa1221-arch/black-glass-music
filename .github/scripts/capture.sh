@@ -276,46 +276,42 @@ if has "$SONG_TITLE" && ! has "Import progress"; then
     if has "$SONG_TITLE" && ! has "Local"; then return 0; fi
     return 1
   }
+  # Emulator playback runs FASTER than realtime (~1.4x, no audio device):
+  # in run 10 the 0:25 track's clock showed 0:28-0:32. So: expand FAST and
+  # shoot immediately — no restart tap (it didn't restart), no extra dumps.
   # A: tap the mini-player body
   adb shell input tap 490 2043
   sleep 2
   dump || true
+  shot expand-a
   if ! player_expanded; then
     # B: upward drag on the mini bar ("open with your finger")
     adb shell input swipe 540 2050 540 900 450
     sleep 2
     dump || true
+    shot expand-b
   fi
   if ! player_expanded; then
     # C: tap the mini-player artwork
     adb shell input tap 140 2050
     sleep 2
     dump || true
+    shot expand-c
   fi
   if ! player_expanded; then
     # D: tap the playing row again
     tap_find "$SONG_TITLE" || true
     sleep 2
     dump || true
+    shot expand-d
   fi
   shot player-open
-  # If the immersive hint still appeared, dismiss it; then restart the track
-  # with the player's Previous button (single-song queue = back to 0:00) so
-  # the money shots land safely mid-track with a moving seekbar.
-  dump || true
+  # If the immersive hint still appeared despite the pre-confirm, dismiss it
   if has "Got it"; then tap_find "Got it" --exact || true; sleep 1; fi
-  if player_expanded; then
-    adb shell input tap 231 1912   # Previous / restart
-    sleep 3
-    shot now-playing-1
-    adb shell dumpsys media_session 2>/dev/null | grep -a "PlaybackState" | head -3 || true
-    sleep 4
-    shot now-playing-2
-  else
-    shot now-playing-1
-    sleep 4
-    shot now-playing-2
-  fi
+  shot now-playing-1
+  adb shell dumpsys media_session 2>/dev/null | grep -a "PlaybackState" | head -3 || true
+  sleep 3
+  shot now-playing-2
 else
   log "WARNING: song not found in library UI (or progress sheet stuck)"
   debug_snap
