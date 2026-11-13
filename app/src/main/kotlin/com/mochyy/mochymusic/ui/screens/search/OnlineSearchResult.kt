@@ -82,6 +82,7 @@ import com.mochyy.mochymusic.LocalPlayerConnection
 import com.mochyy.mochymusic.R
 import com.mochyy.mochymusic.constants.PauseSearchHistoryKey
 import com.mochyy.mochymusic.constants.ProfilePicUriKey
+import com.mochyy.mochymusic.constants.UsernameKey
 import com.mochyy.mochymusic.db.entities.SearchHistory
 import com.mochyy.mochymusic.extensions.toMediaItem
 import com.mochyy.mochymusic.extensions.togglePlayPause
@@ -131,6 +132,7 @@ fun OnlineSearchResult(
     val coroutineScope = rememberCoroutineScope()
     val pauseSearchHistory by rememberPreference(PauseSearchHistoryKey, defaultValue = false)
     val profilePicStr by rememberPreference(ProfilePicUriKey, defaultValue = "")
+    val profileName by rememberPreference(UsernameKey, defaultValue = "")
 
     val isPlaying by playerConnection.isEffectivelyPlaying.collectAsState()
     val mediaMetadata by playerConnection.mediaMetadata.collectAsState()
@@ -380,7 +382,7 @@ fun OnlineSearchResult(
             pureBlack = pureBlack,
             title = stringResource(R.string.search),
             trailing = {
-                SearchAvatar(imageUrl = profilePicStr.ifBlank { null }, onClick = { navController.navigateToTab("settings") })
+                SearchAvatar(imageUrl = profilePicStr.ifBlank { null }, name = profileName.ifBlank { null }, onClick = { navController.navigateToTab("settings") })
             },
             below = {
                 SearchCategoryRow(

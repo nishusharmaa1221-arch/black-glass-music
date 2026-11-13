@@ -161,6 +161,18 @@ internal fun ProfileIdCard(
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier.fillMaxSize(),
                             )
+                        } else if (username.isNotBlank()) {
+                            Box(
+                                modifier = Modifier.fillMaxSize().background(Color(0xFFD4AF37)),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Text(
+                                    text = username.trim().first().uppercase(),
+                                    color = Color.Black,
+                                    fontSize = (unit.value * 40f).sp,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            }
                         } else if (onPhotoClick != null) {
                             Icon(
                                 painterResource(R.drawable.add),

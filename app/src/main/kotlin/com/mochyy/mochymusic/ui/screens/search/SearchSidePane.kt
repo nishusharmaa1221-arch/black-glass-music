@@ -37,6 +37,7 @@ import com.mochyy.mochymusic.R
 import com.mochyy.mochymusic.constants.OfflineModeKey
 import com.mochyy.mochymusic.constants.PauseSearchHistoryKey
 import com.mochyy.mochymusic.constants.ProfilePicUriKey
+import com.mochyy.mochymusic.constants.UsernameKey
 import com.mochyy.mochymusic.db.entities.SearchHistory
 import com.mochyy.mochymusic.playback.queues.YouTubeQueue
 import com.mochyy.mochymusic.ui.component.GlassState
@@ -80,6 +81,7 @@ fun SearchSidePane(
     val pauseSearchHistory by rememberPreference(PauseSearchHistoryKey, defaultValue = false)
     val offlineMode by rememberPreference(OfflineModeKey, defaultValue = false)
     val profilePicStr by rememberPreference(ProfilePicUriKey, defaultValue = "")
+    val profileName by rememberPreference(UsernameKey, defaultValue = "")
 
     val suggestionViewModel: OnlineSearchSuggestionViewModel = hiltViewModel()
     val suggestionState by suggestionViewModel.viewState.collectAsState()
@@ -156,7 +158,7 @@ fun SearchSidePane(
             pureBlack = pureBlack,
             title = stringResource(R.string.search),
             trailing = {
-                SearchAvatar(imageUrl = profilePicStr.ifBlank { null }, onClick = { navController.navigateToTab("settings") })
+                SearchAvatar(imageUrl = profilePicStr.ifBlank { null }, name = profileName.ifBlank { null }, onClick = { navController.navigateToTab("settings") })
             },
         ) {
             SearchField(

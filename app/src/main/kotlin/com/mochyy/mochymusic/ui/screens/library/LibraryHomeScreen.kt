@@ -37,6 +37,7 @@ import com.mochyy.mochymusic.LocalPlayerAwareWindowInsets
 import com.mochyy.mochymusic.R
 import com.mochyy.mochymusic.LocalPlayerConnection
 import com.mochyy.mochymusic.constants.ProfilePicUriKey
+import com.mochyy.mochymusic.constants.UsernameKey
 import com.mochyy.mochymusic.db.entities.Song
 import com.mochyy.mochymusic.extensions.toMediaItem
 import com.mochyy.mochymusic.models.TransferBatch
@@ -90,6 +91,7 @@ fun LibraryHomeScreen(
     val isPlaying = playerConnection?.isEffectivelyPlaying?.collectAsState()
 
     val profilePicStr by rememberPreference(ProfilePicUriKey, defaultValue = "")
+    val profileName by rememberPreference(UsernameKey, defaultValue = "")
 
     var query by remember { mutableStateOf(TextFieldValue()) }
     val results = remember(query.text, songs, artists, albums, playlists, tab, shelfData) {
@@ -132,6 +134,7 @@ fun LibraryHomeScreen(
             trailing = {
                 SearchAvatar(
                     imageUrl = profilePicStr.ifBlank { null },
+                    name = profileName.ifBlank { null },
                     onClick = { navController.navigateToTab("settings") },
                 )
             },

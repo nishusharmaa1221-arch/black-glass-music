@@ -59,6 +59,7 @@ import com.mochyy.mochymusic.ui.screens.settings.integrations.IntegrationsRoute
 import com.mochyy.mochymusic.ui.screens.settings.integrations.discord.DiscordRoute
 import com.mochyy.mochymusic.ui.screens.settings.integrations.scrobbleServiceRoute
 import com.mochyy.mochymusic.constants.ProfilePicUriKey
+import com.mochyy.mochymusic.constants.UsernameKey
 import com.mochyy.mochymusic.ui.component.GlassState
 import com.mochyy.mochymusic.ui.component.SettingsHighlight
 import com.mochyy.mochymusic.ui.component.glassRoot
@@ -308,6 +309,7 @@ fun MochySettingsScreen(navController: NavController, pane: SettingsPane? = null
     val glassState = remember { GlassState() }
 
     val (profilePicUri) = rememberPreference(ProfilePicUriKey, "")
+    val (profileName) = rememberPreference(UsernameKey, "")
 
     var query by remember { mutableStateOf(TextFieldValue()) }
     var isSearchFocused by remember { mutableStateOf(false) }
@@ -672,6 +674,7 @@ fun MochySettingsScreen(navController: NavController, pane: SettingsPane? = null
                         translationY = -(1f - collapseProgress) * lift
                     },
                     imageUrl = profilePicUri.ifBlank { null },
+                    name = profileName.ifBlank { null },
                     onClick = {
                         // back to the profile page these were opened from, not a second copy of it on top
                         if (!navController.popBackStack("settings", inclusive = false)) navController.navigateToTab("settings")

@@ -164,6 +164,18 @@ internal fun UserProfilePage(
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize(),
                 )
+            } else if (username.isNotBlank()) {
+                Box(
+                    modifier = Modifier.fillMaxSize().background(Color(0xFFD4AF37)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = username.trim().first().uppercase(),
+                        color = Color.Black,
+                        fontSize = 42.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
             }
         }
         Spacer(Modifier.height(12.dp))

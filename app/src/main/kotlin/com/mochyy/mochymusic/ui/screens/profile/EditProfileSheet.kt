@@ -117,14 +117,14 @@ private fun EditProfileContent(currentName: String, currentPhoto: Any?, onSaved:
             Spacer(Modifier.height(24.dp))
             Text("profile picture", color = Onb.Muted, fontSize = 18.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(12.dp))
-            EditablePhoto(photo = cropped ?: currentPhoto, onClick = ::pickPhoto)
+            EditablePhoto(photo = cropped ?: currentPhoto, name = name, onClick = ::pickPhoto)
         }
     }
 }
 
 /** The picture as it will be saved. Tapping it picks a new one; it dips a little while pressed. */
 @Composable
-private fun EditablePhoto(photo: Any?, onClick: () -> Unit) {
+private fun EditablePhoto(photo: Any?, name: String, onClick: () -> Unit) {
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
     Box(
@@ -147,6 +147,18 @@ private fun EditablePhoto(photo: Any?, onClick: () -> Unit) {
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
             )
+        } else if (name.isNotBlank()) {
+            Box(
+                modifier = Modifier.fillMaxSize().background(Color(0xFFD4AF37)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = name.trim().first().uppercase(),
+                    color = Color.Black,
+                    fontSize = 40.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
         } else {
             Icon(
                 painterResource(R.drawable.add),

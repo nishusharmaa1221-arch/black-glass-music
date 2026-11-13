@@ -410,6 +410,8 @@ fun SearchAvatar(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = 36.dp,
+    /** the profile name; with no photo its first letter becomes the avatar (the owner's Google-style rule) */
+    name: String? = null,
 ) {
     val model = remember(imageUrl) {
         val url = imageUrl?.trim().orEmpty()
@@ -435,6 +437,18 @@ fun SearchAvatar(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
             )
+        } else if (!name.isNullOrBlank()) {
+            Box(
+                modifier = Modifier.fillMaxSize().background(Color(0xFFD4AF37)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = name.trim().first().uppercase(),
+                    color = Color.Black,
+                    fontSize = (size.value * 0.45f).sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
         } else {
             Icon(
                 painter = painterResource(R.drawable.person),
