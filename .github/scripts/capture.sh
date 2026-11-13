@@ -190,18 +190,49 @@ goto_library() {
 # ------------------------------------------------------- library & play
 goto_library
 dump || true
-# Local device songs live under the "Local" filter chip, not in "All"
+# Local device songs live under the "Local" filter chip, not in "All",
+# and Musify only lists them after an explicit import (Add music sheet).
 if ! has "$SONG_TITLE"; then
   tap_find "Local" --exact || true
   sleep 3
   dump || true
 fi
-shot library
+shot library-local-empty
+if ! has "$SONG_TITLE" && has "Import your local music here"; then
+  log "opening Add music sheet (device scan list)"
+  tap_find "Import your local music here" || true
+  if wait_for_text "$SONG_TITLE" 25; then
+    shot add-music-sheet
+    tap_find "Select all" || tap_find "$SONG_TITLE" || true
+    sleep 1
+    dump || true
+    if tap_find "Add 1" || tap_find "Add"; then log "import started"; fi
+    sleep 6
+    dump || true
+    shot after-import
+    # progress sheet may need dismissing
+    if has "Done"; then tap_find "Done" --exact || true; sleep 2; fi
+    if has "Close"; then tap_find "Close" --exact || true; sleep 2; fi
+  else
+    log "WARNING: song not listed in Add music sheet"
+    debug_snap
+  fi
+fi
+# after import, the song should surface in the Local tab / Songs shelf card
+dump || true
 if ! has "$SONG_TITLE"; then
-  adb shell input swipe 540 1700 540 800 400
+  goto_library
+  dump || true
+  tap_find "Local" --exact || true
   sleep 2
   dump || true
-  shot library-scrolled
+fi
+shot library
+if ! has "$SONG_TITLE"; then
+  tap_find "Songs" || true
+  sleep 3
+  dump || true
+  shot library-songs
 fi
 
 if has "$SONG_TITLE"; then
@@ -251,20 +282,26 @@ open_audio_lab() {
   return 1
 }
 if ! open_audio_lab; then
-  # look for a route into the full settings list, then use its search
-  tap_find "All settings" || tap_find "Settings" || true
-  sleep 2
+  # Profile screen has a Settings section with an "Open settings" button
+  for s in 1 2 3; do
+    dump || true
+    if has "Open settings"; then tap_find "Open settings" && break; fi
+    adb shell input swipe 540 1800 540 800 400
+    sleep 1
+  done
+  sleep 3
   if ! open_audio_lab; then
     dump || true
     if has "Search settings"; then
       tap_find "Search settings" || tap_field 0 || true
       sleep 1
-      adb shell input text "Audio Lab"
+      adb shell input text "Equalizer"
       sleep 2
       dump || true
-      tap_find "Audio Lab" || tap_find "Equalizer" || true
+      shot settings-search-eq
+      tap_find "Equalizer" || tap_find "Audio Lab" || true
     else
-      for s in 1 2 3; do
+      for s in 1 2 3 4; do
         adb shell input swipe 540 1800 540 700 400
         sleep 1
         if open_audio_lab; then break; fi
