@@ -453,15 +453,13 @@ private fun Density.placementAt(state: LaunchIntroState, size: IntSize): MarkPla
 
 /** the two marks, in the splash drawable's units, ready to draw at any scale */
 private class LaunchMarkArt {
-    private val triangle = path(
-        "M163.5 96.3493C180.167 105.972 180.167 130.028 163.5 139.651L108 171.694C91.3333 181.316 " +
-            "70.5 169.288 70.5 150.043V85.9569C70.5 66.7119 91.3333 54.6838 108 64.3063L163.5 96.3493Z"
-    )
-    // the face: the little chevron and the smile under it
-    private val face = path("M97 112L108.5 98L120 112M110.325 125C111.871 133.439 121.868 148.704 142.944 149.92")
+    // the Musify M mark, the same geometry as ic_mochy_mark / ic_splash_mark
+    private val triangle = path("M66 174V62H90L118 118L146 62H170V174H146V126L118 148L90 126V174Z")
+    // the old mark had a separate face layer; the M is a single shape, so this draws nothing
+    private val face = path("M0 0")
     private val mask = Path().apply { addCircle(Pivot.x, Pivot.y, SplashMaskRadius, Path.Direction.CW) }
 
-    // ic_splash_mark: a white shape with a dark outline and a dark face
+    // ic_splash_mark: a white shape with a dark outline
     private val fill = paint(android.graphics.Color.WHITE) { style = Paint.Style.FILL }
     private val darkOutline = paint(0xFF212121.toInt()) {
         style = Paint.Style.STROKE
