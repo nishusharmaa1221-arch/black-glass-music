@@ -261,29 +261,41 @@ if has "$SONG_TITLE" && ! has "Import progress"; then
   log "song visible in library — tapping to play"
   tap_find "$SONG_TITLE" || true
   sleep 2
-  dump || true
   shot after-tap-song
-  adb shell dumpsys media_session 2>/dev/null | grep -a "PlaybackState" | head -3 || true
-  # Expand the flagship player. Run 7 proof: tapping the mini-player title
-  # does NOT expand it — this build opens the player with an upward drag on
-  # the mini bar ("open with your finger"). Try drag, then artwork tap,
-  # then a longer drag. Expanded = bottom nav no longer in the tree.
-  expanded() { dump || true; ! has_desc_exact "Your Library"; }
-  if ! expanded; then
-    adb shell input swipe 540 2050 540 1000 450
+  # Expand the flagship player. Runs 7-8 never actually attempted this: the
+  # old detector keyed on a "Your Library" desc that this screen doesn't
+  # have, so it reported "expanded" instantly. Fixed coords below come from
+  # the run 7/8 screenshots (mini bar y~2050, title x~490, artwork x~140).
+  # Expanded test on the CURRENT dump: a standalone "m:ss" time node (the
+  # full player's clock) or the list's "Local" header having disappeared.
+  player_expanded() {
+    if texts | grep -qE '^T: [0-9]+:[0-9]{2}$'; then return 0; fi
+    if has "$SONG_TITLE" && ! has "Local"; then return 0; fi
+    return 1
+  }
+  # A: tap the mini-player body
+  adb shell input tap 490 2043
+  sleep 2
+  dump || true
+  if ! player_expanded; then
+    # B: upward drag on the mini bar ("open with your finger")
+    adb shell input swipe 540 2050 540 900 450
     sleep 2
+    dump || true
   fi
-  if ! expanded; then
+  if ! player_expanded; then
+    # C: tap the mini-player artwork
     adb shell input tap 140 2050
     sleep 2
+    dump || true
   fi
-  if ! expanded; then
-    adb shell input swipe 540 2080 540 500 700
+  if ! player_expanded; then
+    # D: tap the playing row again
+    tap_find "$SONG_TITLE" || true
     sleep 2
+    dump || true
   fi
-  dump || true
   shot player-open
-  sleep 2
   shot now-playing-1
   adb shell dumpsys media_session 2>/dev/null | grep -a "PlaybackState" | head -3 || true
   sleep 4
