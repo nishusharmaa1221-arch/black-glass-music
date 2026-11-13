@@ -122,7 +122,7 @@ fun BlackGlassLoginScreen(
             }
             Spacer(Modifier.height(16.dp))
             Text(
-                text = "Black Glass Music",
+                text = "Musify",
                 color = Color.White,
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
