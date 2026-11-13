@@ -1,11 +1,13 @@
 // BlackGlassLoginScreen.kt
 //
 // Musify login gate — REAL accounts backed by Firebase Authentication.
-// - One account per email: Firebase itself rejects a second signup with the
-//   same email (FirebaseAuthUserCollisionException).
-// - Unique usernames: before signup we claim usernames/{username} in
-//   Firestore; a name that already exists is rejected, so two accounts can
-//   never share a username.
+// - Sign up is email + password + confirm password ONLY (the owner removed
+//   the username field from this form on 2026-11-13). One account per email:
+//   Firebase itself rejects a second signup with the same email
+//   (FirebaseAuthUserCollisionException).
+// - The username lives on the app's own first-run profile setup ("Let's
+//   create your profile!") instead, where it is set once and can be edited
+//   later from the profile page.
 // - Login only succeeds with the correct email + password.
 // The session is Firebase's own persisted session: once signed in, the gate
 // stays open across restarts until the user signs out.
@@ -27,6 +29,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -35,7 +38,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
@@ -55,6 +57,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.zIndex
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.Color
@@ -77,7 +80,6 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.FirebaseTooManyRequestsException
-import com.google.firebase.auth.UserProfileChangeRequest
 
 object BlackGlassAuth {
     fun isLoggedIn(context: Context): Boolean =
@@ -144,9 +146,10 @@ fun BlackGlassLoginScreen(
     val auth = remember { FirebaseAuth.getInstance() }
 
     var createMode by remember { mutableStateOf(false) }
-    var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var confirmVisible by remember { mutableStateOf(false) }
     var passwordVisible by remember { mutableStateOf(false) }
     var loading by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -177,12 +180,7 @@ fun BlackGlassLoginScreen(
     }
 
     fun doCreate() {
-        val uname = username.trim().lowercase()
         val em = email.trim()
-        if (!Regex("^[a-z0-9_.]{3,20}$").matches(uname)) {
-            fail("Username 3-20 characters ka rakho — sirf letters, numbers, . ya _")
-            return
-        }
         if (!Patterns.EMAIL_ADDRESS.matcher(em).matches()) {
             fail("Email sahi se likho")
             return
@@ -191,90 +189,44 @@ fun BlackGlassLoginScreen(
             fail("Password kam se kam 6 characters ka rakho")
             return
         }
+        if (confirmPassword != password) {
+            fail("Confirm password match nahi ho raha — dono jagah ek hi password likho")
+            return
+        }
         loading = true
         error = null
         info = null
-        // Step 1: is the username free? (usernames are public-read in the rules)
-        val mainHandler = Handler(Looper.getMainLooper())
-        Thread {
-            val checkCode = runCatching {
-                firestoreRequest("GET", "$FirestoreBase/usernames/$uname", null, null)
-            }.getOrDefault(-1)
-            mainHandler.post {
-                when {
-                    checkCode == 200 ->
-                        fail("Ye username pehle se liya gaya hai — koi dusra chuno")
-                    checkCode != 404 ->
-                        fail("Server se connect nahi ho paya — internet check karke dobara try karo")
-                    else -> {
-                        // Step 2: create the account
-                        auth.createUserWithEmailAndPassword(em, password)
-                            .addOnSuccessListener { result ->
-                                val user = result.user
-                                runCatching {
-                                    user?.updateProfile(
-                                        UserProfileChangeRequest.Builder()
-                                            .setDisplayName(uname)
-                                            .build()
-                                    )
-                                }
-                                val uid = user?.uid
-                                if (user == null || uid == null) {
-                                    onLoggedIn()
-                                    return@addOnSuccessListener
-                                }
-                                // Step 3: claim the username + save the profile (REST, with his ID token)
-                                user.getIdToken(false)
-                                    .addOnSuccessListener { tokenResult ->
-                                        Thread {
-                                            val now = Instant.now().toString()
-                                            val unameBody =
-                                                "{\"fields\":{\"uid\":{\"stringValue\":\"" + uid.jsonEsc() +
-                                                    "\"},\"email\":{\"stringValue\":\"" + em.jsonEsc() +
-                                                    "\"},\"createdAt\":{\"timestampValue\":\"" + now + "\"}}}"
-                                            val claimCode = runCatching {
-                                                firestoreRequest(
-                                                    "POST",
-                                                    "$FirestoreBase/usernames?documentId=$uname",
-                                                    tokenResult.token,
-                                                    unameBody
-                                                )
-                                            }.getOrDefault(-1)
-                                            when (claimCode) {
-                                                200 -> {
-                                                    val userBody =
-                                                        "{\"fields\":{\"username\":{\"stringValue\":\"" + uname.jsonEsc() +
-                                                            "\"},\"email\":{\"stringValue\":\"" + em.jsonEsc() +
-                                                            "\"},\"createdAt\":{\"timestampValue\":\"" + now + "\"}}}"
-                                                    runCatching {
-                                                        firestoreRequest(
-                                                            "POST",
-                                                            "$FirestoreBase/users?documentId=$uid",
-                                                            tokenResult.token,
-                                                            userBody
-                                                        )
-                                                    }
-                                                    mainHandler.post { onLoggedIn() }
-                                                }
-                                                // someone grabbed the name between check and claim:
-                                                // remove the orphan account so the email stays usable
-                                                409 -> {
-                                                    runCatching { user.delete() }
-                                                    mainHandler.post {
-                                                        fail("Ye username pehle se liya gaya hai — koi dusra chuno")
-                                                    }
-                                                }
-                                                else -> mainHandler.post { onLoggedIn() }
-                                            }
-                                        }.start()
-                                    }
-                                    .addOnFailureListener { onLoggedIn() }
-                            }
-                            .addOnFailureListener { e -> fail(authErrorMessage(e, createMode = true)) }
-                    }
+        auth.createUserWithEmailAndPassword(em, password)
+            .addOnSuccessListener { result ->
+                val user = result.user
+                val uid = user?.uid
+                if (user == null || uid == null) {
+                    onLoggedIn()
+                    return@addOnSuccessListener
                 }
+                // save a small profile record (email + createdAt) — best effort,
+                // the account itself is already created either way
+                user.getIdToken(false)
+                    .addOnSuccessListener { tokenResult ->
+                        Thread {
+                            val now = Instant.now().toString()
+                            val userBody =
+                                "{\"fields\":{\"email\":{\"stringValue\":\"" + em.jsonEsc() +
+                                    "\"},\"createdAt\":{\"timestampValue\":\"" + now + "\"}}}"
+                            runCatching {
+                                firestoreRequest(
+                                    "POST",
+                                    "$FirestoreBase/users?documentId=$uid",
+                                    tokenResult.token,
+                                    userBody
+                                )
+                            }
+                            Handler(Looper.getMainLooper()).post { onLoggedIn() }
+                        }.start()
+                    }
+                    .addOnFailureListener { onLoggedIn() }
             }
-        }.start()
+            .addOnFailureListener { e -> fail(authErrorMessage(e, createMode = true)) }
     }
 
     fun doForgotPassword() {
@@ -314,26 +266,49 @@ fun BlackGlassLoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            // Gold ring logo
+            // Gold ring logo — gradient gold ring, the app M inside
             Box(
                 modifier = Modifier
-                    .size(84.dp)
+                    .size(92.dp)
                     .clip(CircleShape)
-                    .border(2.dp, Gold, CircleShape)
-                    .background(Color(0x14D4AF37)),
+                    .background(
+                        Brush.radialGradient(
+                            colors = listOf(Color(0x2ED4AF37), Color.Transparent),
+                        )
+                    ),
                 contentAlignment = Alignment.Center,
             ) {
-                Image(
-                    painter = painterResource(R.drawable.ic_launcher_m),
-                    contentDescription = null,
-                    modifier = Modifier.size(46.dp),
-                )
+                Box(
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(CircleShape)
+                        .border(
+                            2.dp,
+                            Brush.sweepGradient(
+                                listOf(
+                                    Gold,
+                                    Color(0xFF7A5E14),
+                                    Color(0xFFF3D27A),
+                                    Gold,
+                                )
+                            ),
+                            CircleShape,
+                        )
+                        .background(Color(0x14D4AF37)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.ic_launcher_m),
+                        contentDescription = null,
+                        modifier = Modifier.size(44.dp),
+                    )
+                }
             }
             Spacer(Modifier.height(16.dp))
             Text(
                 text = "Musify",
                 color = Color.White,
-                fontSize = 26.sp,
+                fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
             )
             Text(
@@ -349,9 +324,27 @@ fun BlackGlassLoginScreen(
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(24.dp))
                     .background(GlassFill)
-                    .border(1.dp, GlassBorder, RoundedCornerShape(24.dp))
+                    .border(
+                        1.dp,
+                        Brush.linearGradient(
+                            listOf(Color(0x73D4AF37), GlassBorder, Color(0x73D4AF37))
+                        ),
+                        RoundedCornerShape(24.dp),
+                    )
                     .padding(20.dp),
             ) {
+                Text(
+                    text = if (createMode) "Create your account" else "Welcome back",
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    text = if (createMode) "Sign up karke apni music journey shuru karo" else "Login karo aur music sunte raho",
+                    color = Color(0xFFBDBDBD),
+                    fontSize = 13.sp,
+                    modifier = Modifier.padding(top = 4.dp, bottom = 18.dp),
+                )
                 val fieldColors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Gold,
                     unfocusedBorderColor = GlassBorder,
@@ -364,20 +357,6 @@ fun BlackGlassLoginScreen(
                     unfocusedLeadingIconColor = Color(0xFF9E9E9E),
                 )
 
-                if (createMode) {
-                    OutlinedTextField(
-                        value = username,
-                        onValueChange = { username = it },
-                        label = { Text("Username") },
-                        leadingIcon = { Icon(Icons.Filled.Person, contentDescription = null) },
-                        singleLine = true,
-                        enabled = !loading,
-                        colors = fieldColors,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    Spacer(Modifier.height(12.dp))
-                }
-
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
@@ -386,6 +365,7 @@ fun BlackGlassLoginScreen(
                     singleLine = true,
                     enabled = !loading,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    shape = RoundedCornerShape(14.dp),
                     colors = fieldColors,
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -400,6 +380,7 @@ fun BlackGlassLoginScreen(
                     enabled = !loading,
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    shape = RoundedCornerShape(14.dp),
                     trailingIcon = {
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
                             Icon(
@@ -412,6 +393,32 @@ fun BlackGlassLoginScreen(
                     colors = fieldColors,
                     modifier = Modifier.fillMaxWidth(),
                 )
+
+                if (createMode) {
+                    Spacer(Modifier.height(12.dp))
+                    OutlinedTextField(
+                        value = confirmPassword,
+                        onValueChange = { confirmPassword = it },
+                        label = { Text("Confirm Password") },
+                        leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
+                        singleLine = true,
+                        enabled = !loading,
+                        visualTransformation = if (confirmVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        shape = RoundedCornerShape(14.dp),
+                        trailingIcon = {
+                            IconButton(onClick = { confirmVisible = !confirmVisible }) {
+                                Icon(
+                                    imageVector = if (confirmVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                    contentDescription = if (confirmVisible) "Hide password" else "Show password",
+                                    tint = Color(0xFFBDBDBD),
+                                )
+                            }
+                        },
+                        colors = fieldColors,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
 
                 if (!createMode) {
                     Row(
@@ -490,36 +497,52 @@ fun BlackGlassLoginScreen(
                 }
                 Spacer(Modifier.height(16.dp))
 
-                Button(
-                    onClick = {
-                        error = null
-                        info = "Google login abhi taiyaar nahi hai — email se login karo"
-                    },
-                    enabled = !loading,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0x1AFFFFFF),
-                        contentColor = Color.White,
-                    ),
-                    shape = RoundedCornerShape(14.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                        .border(1.dp, GlassBorder, RoundedCornerShape(14.dp)),
-                ) {
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    Button(
+                        onClick = {
+                            error = null
+                            info = "Google login jald aa raha hai — abhi email se login karo"
+                        },
+                        enabled = !loading,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0x1AFFFFFF),
+                            contentColor = Color.White,
+                        ),
+                        shape = RoundedCornerShape(14.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                            .border(1.dp, GlassBorder, RoundedCornerShape(14.dp)),
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_google_g),
+                            contentDescription = null,
+                            tint = Color.Unspecified,
+                            modifier = Modifier.size(20.dp),
+                        )
+                        Text(
+                            text = "  Continue with Google",
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Medium,
+                        )
+                    }
+                    // COMING SOON tag on the button's top-right corner
                     Box(
                         modifier = Modifier
-                            .size(22.dp)
-                            .clip(CircleShape)
-                            .background(Color.White),
-                        contentAlignment = Alignment.Center,
+                            .align(Alignment.TopEnd)
+                            .offset(x = (-10).dp, y = (-7).dp)
+                            .zIndex(1f)
+                            .clip(RoundedCornerShape(50))
+                            .background(Gold)
+                            .padding(horizontal = 8.dp, vertical = 3.dp),
                     ) {
-                        Text("G", color = Color.Black, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                        Text(
+                            text = "COMING SOON",
+                            color = Color.Black,
+                            fontSize = 8.5.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
                     }
-                    Text(
-                        text = "  Continue with Google",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Medium,
-                    )
                 }
             }
 

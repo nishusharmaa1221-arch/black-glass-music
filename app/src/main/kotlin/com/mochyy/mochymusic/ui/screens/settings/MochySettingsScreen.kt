@@ -323,6 +323,10 @@ fun MochySettingsScreen(navController: NavController, pane: SettingsPane? = null
     val recommendedItem = remember { RecommendedOptions.random() }
 
     val context = LocalContext.current
+    var showLogoutDialog by remember { mutableStateOf(false) }
+    val accountEmail = remember {
+        runCatching { com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.email }.getOrNull()
+    }
     val results = remember(query.text, context) {
         val q = query.text.trim()
         if (q.isBlank()) {
@@ -580,6 +584,13 @@ fun MochySettingsScreen(navController: NavController, pane: SettingsPane? = null
 
                         // pages the modules that are on bring to settings, right under modules
                         com.mochyy.mochymusic.ui.screens.settings.modules.ModuleSettingsPages(open = open, selected = selected)
+
+                        CategoryBubble(
+                            title = "Log out",
+                            iconRes = R.drawable.logout,
+                            selected = false,
+                            onClick = { showLogoutDialog = true }
+                        )
                     }
                 }
             }
@@ -591,6 +602,38 @@ fun MochySettingsScreen(navController: NavController, pane: SettingsPane? = null
             // Headroom spacer for smooth scrolling past collapse threshold and bottom bar
             Spacer(modifier = Modifier.height(bottomSpacerHeight))
         }
+        }
+
+        if (showLogoutDialog) {
+            androidx.compose.material3.AlertDialog(
+                onDismissRequest = { showLogoutDialog = false },
+                title = { androidx.compose.material3.Text("Log out?") },
+                text = {
+                    androidx.compose.material3.Text(
+                        "Tum apne Musify account" + (accountEmail?.let { " ($it)" } ?: "") +
+                            " se log out ho jaoge. Tumhare gaane aur library phone mein hi rahenge."
+                    )
+                },
+                confirmButton = {
+                    androidx.compose.material3.TextButton(
+                        onClick = {
+                            showLogoutDialog = false
+                            com.mochyy.mochymusic.ui.launch.BlackGlassAuth.signOut()
+                            val restart = context.packageManager.getLaunchIntentForPackage(context.packageName)
+                            restart?.addFlags(
+                                android.content.Intent.FLAG_ACTIVITY_NEW_TASK or
+                                    android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            )
+                            if (restart != null) context.startActivity(restart)
+                        }
+                    ) { androidx.compose.material3.Text("Log out", color = Color(0xFFFF8A80)) }
+                },
+                dismissButton = {
+                    androidx.compose.material3.TextButton(
+                        onClick = { showLogoutDialog = false }
+                    ) { androidx.compose.material3.Text("Cancel") }
+                },
+            )
         }
 
         // Top bar: Mochy mark + "Settings" title slide away on scroll (progressive glass blur
