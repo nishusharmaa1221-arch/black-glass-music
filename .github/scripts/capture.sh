@@ -260,21 +260,32 @@ fi
 if has "$SONG_TITLE" && ! has "Import progress"; then
   log "song visible in library — tapping to play"
   tap_find "$SONG_TITLE" || true
-  sleep 3
+  sleep 2
   dump || true
   shot after-tap-song
-  adb shell dumpsys media_session 2>/dev/null | grep -a "PlaybackState\|position" | head -4 || true
-  # If the bottom nav vanished, the full player is already open — don't tap
-  # the title again (could navigate away). Otherwise tap the mini-player bar
-  # (the title's LAST match) to expand the full player.
-  if has_desc_exact "Your Library"; then
-    tap_find "$SONG_TITLE" --last || true
-    sleep 3
-    dump || true
+  adb shell dumpsys media_session 2>/dev/null | grep -a "PlaybackState" | head -3 || true
+  # Expand the flagship player. Run 7 proof: tapping the mini-player title
+  # does NOT expand it — this build opens the player with an upward drag on
+  # the mini bar ("open with your finger"). Try drag, then artwork tap,
+  # then a longer drag. Expanded = bottom nav no longer in the tree.
+  expanded() { dump || true; ! has_desc_exact "Your Library"; }
+  if ! expanded; then
+    adb shell input swipe 540 2050 540 1000 450
+    sleep 2
   fi
+  if ! expanded; then
+    adb shell input tap 140 2050
+    sleep 2
+  fi
+  if ! expanded; then
+    adb shell input swipe 540 2080 540 500 700
+    sleep 2
+  fi
+  dump || true
   shot player-open
-  sleep 3
+  sleep 2
   shot now-playing-1
+  adb shell dumpsys media_session 2>/dev/null | grep -a "PlaybackState" | head -3 || true
   sleep 4
   shot now-playing-2
 else
