@@ -368,6 +368,7 @@ dependencies {
     // Musify accounts (Firebase Auth + Firestore for unique usernames)
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
     implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-common")
     implementation("com.google.firebase:firebase-firestore") {
         // protolite bundles protobuf classes that clash with the app's own
         // protobuf-javalite (which already carries the well-known types)
