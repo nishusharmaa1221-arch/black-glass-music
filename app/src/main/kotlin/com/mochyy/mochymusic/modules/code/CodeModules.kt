@@ -71,7 +71,7 @@ internal object CodeModules {
         apk.setReadOnly()
         val info = context.packageManager.getPackageArchiveInfo(apk.path, SignatureFlags or PackageManager.GET_META_DATA)
         if (!signedLikeMochy(context, info)) {
-            Timber.tag(Tag).w("Skipping the module in $folder: not signed like Mochy")
+            Timber.tag(Tag).w("Skipping the module in $folder: not signed like Musify")
             return null
         }
         val entry = info?.applicationInfo?.metaData?.getString(ModuleRegistry.EntryMetaKey) ?: return null

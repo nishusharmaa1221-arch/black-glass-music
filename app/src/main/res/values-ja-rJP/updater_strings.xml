@@ -20,7 +20,7 @@
     <string name="installing_system_update">Installing system\nupdate…</string>
     <string name="making_update_ready">更新準備中(これには時間がかかることがあります)</string>
     <string name="your_app_getting_better">あなたのアプリをより良くしています…</string>
-    <string name="update_includes_features">Mochy music %1$sアップデートには便利な新機能が含まれています。　詳しくはこちらを見てください: %2$s</string>
+    <string name="update_includes_features">Musify music %1$sアップデートには便利な新機能が含まれています。　詳しくはこちらを見てください: %2$s</string>
     <string name="whats_new">新着情報</string>
     <string name="update_available">アップデート</string>
     <string name="checking_for_updates">アップデートを確認中…</string>
@@ -35,7 +35,7 @@
     <string name="mobile_network_warning">モバイルネットワーク経由、またはローミング中にアップデートをダウンロードすると、追加料金が発生する場合があります</string>
     <string name="update_size">更新容量: %1$s MB</string>
     <string name="check_internet_connection">ネット接続を確認してください</string>
-    <string name="mochy_music_version">mochy MUSIC バージョン %1$s</string>
+    <string name="mochy_music_version">MUSIFY バージョン %1$s</string>
     <string name="last_checked">Last checked: %1$s</string>
     <string name="install">インストール</string>
     <string name="check_for_update">更新チェック</string>
@@ -51,12 +51,12 @@
     <string name="update_notifications_subtitle">新しいアップデートがあるときに通知</string>
     <string name="settings_check_updates_title">アップデートを確認</string>
     <string name="later">Later</string>
-    <string name="mochy_music_title">mochy MUSIC</string>
+    <string name="mochy_music_title">MUSIFY</string>
     <string name="developer_section">開発者</string>
     <string name="collaborator_section">協力者</string>
     <string name="app_info_section">アプリ情報</string>
     <string name="community_section">コミニュティ</string>
-    <string name="developer_name">mochyDH P ASHOKAN</string>
+    <string name="developer_name">Nirbhay Sharma</string>
     <string name="app_developer">主任開発者</string>
     <string name="website">サイト</string>
     <string name="collaborator_tboyke">T-Boyke</string>

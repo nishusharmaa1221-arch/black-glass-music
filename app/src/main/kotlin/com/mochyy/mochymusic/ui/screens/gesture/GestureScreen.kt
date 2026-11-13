@@ -119,11 +119,11 @@ fun GestureScreen(navController: NavController) = CustomisationScreen(navControl
 
 // the customize page's parts in order, with what a search or a settings result can find each one by
 private enum class CustomiseSection(@StringRes val titleRes: Int, val keys: List<String>, val words: String) {
-    ICONS(R.string.customise_icons, listOf("Icons", "App icon"), "icon icons app launcher home screen mochy outline anime material you white black dark transparent"),
+    ICONS(R.string.customise_icons, listOf("Icons", "App icon"), "icon icons app launcher home screen Musify outline anime material you white black dark transparent"),
     ROUNDING(R.string.customise_cover_rounding, listOf("Cover rounding"), "cover rounding corner radius square rounded art"),
     PLAYLIST(R.string.customise_playlist_styles, listOf("Playlist styles"), "playlist styles flow classic minimal header"),
     PLAYER(R.string.customise_player_styles, listOf("Player styles"), "player styles flagship turntable ipod poster timeline lyrics editor customize landscape sideways full cover square"),
-    HOME(R.string.customise_home_styles, listOf("Home styles"), "home styles mochyy listen now hop in hero"),
+    HOME(R.string.customise_home_styles, listOf("Home styles"), "home styles Musifyy listen now hop in hero"),
     BLUR(R.string.appearance_blur, listOf("Blur", "Progressive blur", "Blur quality", "Blur strength"), "blur glass frosted progressive flat quality low high strength px"),
     ELEMENT_BLUR(R.string.customise_element_blur, listOf("Element blur"), "element blur lyrics lines cover zoom titles menus page swipes"),
     ANIMATION(R.string.appearance_animation, listOf("Animation", "Animation speed"), "animation speed motion transitions off faster slower"),

@@ -78,7 +78,7 @@ internal class UsbDacAccess(context: Context, private val onChanged: () -> Unit)
         _permitted.value = device()?.let(::hasPermission)
     }
 
-    /** shows android's "allow mochy to access" dialog, once per plug */
+    /** shows android's "allow Musify to access" dialog, once per plug */
     @Synchronized
     fun requestPermission() {
         val usb = manager ?: return

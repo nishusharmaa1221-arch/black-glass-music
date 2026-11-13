@@ -55,7 +55,7 @@ object StoragePlaces {
             return phone
         }
         if (needsFolderAccess(context, root)) {
-            Log.w(Tag, "${kind.folder} lives in a folder mochy lost access to, using the phone for now")
+            Log.w(Tag, "${kind.folder} lives in a folder Musify lost access to, using the phone for now")
             return phone
         }
         return File(root, kind.folder)
@@ -123,7 +123,7 @@ object StoragePlaces {
             ?.let(::File)
     }
 
-    // "Music/Mochy" on the phone, "card name/Music/Mochy" on a card
+    // "Music/Mochy" on the phone, "card name/Music/Musify" on a card
     private fun readablePath(context: Context, folder: File): String {
         @Suppress("DEPRECATION")
         val phoneRoot = Environment.getExternalStorageDirectory().path

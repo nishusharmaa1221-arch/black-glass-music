@@ -40,7 +40,7 @@ internal class LinkPairingDoor(
         advert = LinkAdvert(
             context,
             LinkWire.PairServiceType,
-            "Mochy $name",
+            "Musify $name",
             port,
             mapOf(
                 LinkWire.AttrId to LinkIdentity.id(context),

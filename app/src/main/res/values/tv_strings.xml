@@ -3,9 +3,9 @@
     <!-- the tv app -->
     <string name="tv_hii">hii!</string>
     <string name="tv_tap_anything">Press any button to continue</string>
-    <string name="tv_welcome">welcome\nTo Mochy Music</string>
+    <string name="tv_welcome">welcome\nTo Musify</string>
     <string name="tv_lets_sync">Let\'s sync to your phone</string>
-    <string name="tv_skip_phone">Use Mochy without a phone</string>
+    <string name="tv_skip_phone">Use Musify without a phone</string>
     <string name="tv_whats_your_name">What should we call you?</string>
     <string name="tv_continue">Continue</string>
     <string name="tv_whos_listening">Who\'s listening?</string>
@@ -70,7 +70,7 @@
 
     <string name="tv_sync_from_phone">Sync From Phone</string>
     <string name="tv_same_wifi">Make sure your phone is on the same Wi-Fi as this TV</string>
-    <string name="tv_pair_step_open">Open Mochy on your phone and go to Settings → Device integration → Add device</string>
+    <string name="tv_pair_step_open">Open Musify on your phone and go to Settings → Device integration → Add device</string>
     <string name="tv_pair_step_pick">Pick %1$s from the list</string>
     <string name="tv_pair_step_code">Type the code above</string>
     <string name="tv_from_phone">From %1$s</string>
@@ -80,9 +80,9 @@
     <string name="tv_controlled_from">Controlled from %1$s</string>
     <string name="tv_sync_looking">Looking for your phone…</string>
     <string name="tv_sync_syncing">Syncing your library…</string>
-    <string name="tv_sync_away">Your phone isn\'t around. Open Mochy on it, on the same Wi-Fi.</string>
+    <string name="tv_sync_away">Your phone isn\'t around. Open Musify on it, on the same Wi-Fi.</string>
     <string name="tv_sync_unlinked">Your phone unlinked this TV. The library stays here.</string>
-    <string name="tv_sync_failed">Couldn\'t sync. Make sure Mochy is up to date on both and try again.</string>
+    <string name="tv_sync_failed">Couldn\'t sync. Make sure Musify is up to date on both and try again.</string>
     <string name="tv_sync_no_phone">No phone linked</string>
     <string name="tv_sync_just_now">Synced just now</string>
     <plurals name="tv_sync_minutes_ago">
@@ -95,7 +95,7 @@
     </plurals>
 
     <!-- the phone side of the tv link -->
-    <string name="tv_link_title">Mochy on your TV</string>
+    <string name="tv_link_title">Musify on your TV</string>
     <string name="tv_link_tap_to_unlink">Linked. Tap to unlink.</string>
     <string name="tv_link_found">TVs on this Wi-Fi</string>
     <string name="tv_link_enter_code">Type the code on %1$s</string>
@@ -105,14 +105,14 @@
     <string name="tv_link_channel">TV link</string>
 
     <!-- the tv's mochy page -->
-    <string name="tv_mochy">Mochy</string>
+    <string name="tv_mochy">Musify</string>
     <string name="tv_mochy_version">Version %1$s</string>
     <string name="tv_mochy_link_phone">Link your phone to bring your library over</string>
     <string name="tv_mochy_phone_control">Phone can control this TV</string>
     <string name="tv_on">On</string>
     <string name="tv_off">Off</string>
     <string name="tv_mochy_updates">Updates</string>
-    <string name="tv_mochy_support">Support Mochy</string>
+    <string name="tv_mochy_support">Support Musify</string>
     <string name="tv_mochy_support_detail">Help keep it going</string>
 
     <!-- playing next, up in the tv's player -->
@@ -129,7 +129,7 @@
     <string name="tv_menu_control">Control %1$s</string>
     <string name="tv_menu_sent">Playing on %1$s</string>
     <string name="tv_menu_next_sent">Lined up next on %1$s</string>
-    <string name="tv_menu_unreachable">Couldn\'t reach %1$s. Make sure Mochy is open on it.</string>
+    <string name="tv_menu_unreachable">Couldn\'t reach %1$s. Make sure Musify is open on it.</string>
     <string name="tv_menu_nothing_on">Nothing playing</string>
     <string name="tv_link_open_now">Open right now. Tap to unlink.</string>
     <string name="tv_link_control_title">Open now</string>
@@ -141,7 +141,7 @@
     <string name="tv_link_status_open">Open now</string>
     <string name="tv_link_status_open_synced">Open now · synced %1$s</string>
     <string name="tv_link_status_seen">Last open %1$s</string>
-    <string name="tv_link_status_waiting">Waiting for Mochy to open on it</string>
+    <string name="tv_link_status_waiting">Waiting for Musify to open on it</string>
     <string name="tv_link_status_connected">Connected to %1$s</string>
     <string name="tv_link_status_connected_detail">Your library is in step</string>
     <string name="tv_link_status_streaming">Streaming to %1$s</string>

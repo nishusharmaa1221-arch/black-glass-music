@@ -1,4 +1,4 @@
-// the "support mochy's development" sheet: the auto prompt, help us! on the version sheet, and support me on about app all open this
+// the "support Musify's development" sheet: the auto prompt, help us! on the version sheet, and support me on about app all open this
 
 package com.mochyy.mochymusic.ui.screens.donate
 
@@ -89,7 +89,7 @@ private fun SupportSheetContent() {
             Text(
                 text = "thanks for trying it out! btw, Musify will always be free, forever yours! <3\n\n" +
                     "It would be very useful for us if you support the developer, no matter how small it is!! <3\n" +
-                    "giving a star to Mochy’s repo is already enough. and thanks again!",
+                    "giving a star to Musify’s repo is already enough. and thanks again!",
                 fontSize = 13.5.sp,
                 lineHeight = 18.sp,
                 fontWeight = FontWeight.Bold,

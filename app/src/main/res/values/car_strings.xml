@@ -32,7 +32,7 @@
     <string name="car_pair_code">Pairing code</string>
     <string name="car_pair_status">Status</string>
     <string name="car_pair_how">How to pair</string>
-    <string name="car_pair_steps">On the other phone, open Mochy and go to Settings › Device integration › Add device, then type this code. Both phones need the same Wi-Fi.</string>
+    <string name="car_pair_steps">On the other phone, open Musify and go to Settings › Device integration › Add device, then type this code. Both phones need the same Wi-Fi.</string>
     <string name="car_pair_waiting">Not connected. Waiting for a phone to pair.</string>
     <string name="car_pair_connected">Connected to %1$s</string>
     <plurals name="car_pair_connected_more">

@@ -107,120 +107,17 @@ private val LeadDevs = listOf(
     ),
 )
 
-private val BaseCredits = listOf(
-    CreditEntry(
-        name = "vivizzz007",
-        subtitle = "Vivimusic dev, The base of this app",
-        githubUser = "vivizzz007",
-        url = "https://github.com/vivizzz007/vivi-music",
-    ),
-    CreditEntry(
-        name = "Mostafa Alagamy",
-        subtitle = "Metrolist dev, The base of vivmusic too",
-        githubUser = "mostafaalagamy",
-        url = "https://github.com/mostafaalagamy/Metrolist",
-    ),
-)
+private val BaseCredits = emptyList<CreditEntry>()
 
-private val MoreCredits = listOf(
-    CreditEntry(
-        name = "maxrave-dev",
-        subtitle = "SimpMusic · lyrics API provider",
-        githubUser = "maxrave-dev",
-        url = "https://github.com/maxrave-dev/SimpMusic",
-    ),
-    CreditEntry(
-        name = "Rukamori",
-        subtitle = "ArchiveTune · design & architecture inspiration",
-        githubUser = "rukamori",
-        url = "https://github.com/rukamori/ArchiveTune",
-    ),
-    CreditEntry(
-        name = "fast4x",
-        subtitle = "RiMusic · YouTube Music InnerTube service wrapper",
-        githubUser = "fast4x",
-        url = "https://github.com/fast4x/RiMusic",
-    ),
-    CreditEntry(
-        name = "tranxuanthang",
-        subtitle = "LRCLIB · synchronized LRC lyrics provider",
-        githubUser = "tranxuanthang",
-        url = "https://github.com/tranxuanthang/lrclib",
-    ),
-    CreditEntry(
-        name = "monochrome-music",
-        subtitle = "Monochrome Music · lossless FLAC streams",
-        githubUser = "monochrome-music",
-        url = "https://github.com/monochrome-music/monochrome",
-    ),
-    CreditEntry(
-        name = "Jaakko Pasanen",
-        subtitle = "AutoEq · headphone equalizer database",
-        githubUser = "jaakkopasanen",
-        url = "https://github.com/jaakkopasanen/AutoEq",
-    ),
-    CreditEntry(
-        name = "Ibra Al Tabian",
-        subtitle = "LyricsPlus · open source lyrics server",
-        githubUser = "ibratabian17",
-        url = "https://github.com/ibratabian17/LyricsPlus",
-    ),
-    CreditEntry(
-        name = "Boidushya",
-        subtitle = "Better Lyrics API · synced syllable lyrics",
-        githubUser = "boidushya",
-        url = "https://github.com/better-lyrics/api",
-    ),
-)
+private val MoreCredits = emptyList<CreditEntry>()
+
 
 private val Licenses = listOf(
     LicenseEntry(
         tag = "GPL-3.0",
-        title = "Mochy Music · GNU General Public License v3.0",
-        subtitle = "Free and open source software, source code on GitHub",
+        title = "Musify \u00b7 GNU General Public License v3.0",
+        subtitle = "Based on open-source code (GPL-3.0)",
         url = "$GithubRepoUrl/blob/main/LICENSE",
-    ),
-    LicenseEntry(
-        tag = "GPL-3.0",
-        title = "ViviMusic · GNU General Public License v3.0",
-        subtitle = "by vivizzz007 · base project this app was forked from",
-        url = "https://github.com/vivizzz007/vivi-music/blob/main/LICENSE",
-    ),
-    LicenseEntry(
-        tag = "GPL-3.0",
-        title = "Metrolist · GNU General Public License v3.0",
-        subtitle = "by Mostafa Alagamy · base framework",
-        url = "https://github.com/mostafaalagamy/Metrolist/blob/main/LICENSE",
-    ),
-    LicenseEntry(
-        tag = "GPL-3.0",
-        title = "SimpMusic · GNU General Public License v3.0",
-        subtitle = "by maxrave-dev · lyrics provider integration",
-        url = "https://github.com/maxrave-dev/SimpMusic/blob/dev/LICENSE",
-    ),
-    LicenseEntry(
-        tag = "GPL-3.0",
-        title = "ArchiveTune · GNU General Public License v3.0",
-        subtitle = "by Rukamori · design and architectural inspiration",
-        url = "https://github.com/rukamori/ArchiveTune/blob/main/LICENSE",
-    ),
-    LicenseEntry(
-        tag = "GPL-3.0",
-        title = "RiMusic · GNU General Public License v3.0",
-        subtitle = "by fast4x · InnerTube API wrapper",
-        url = "https://github.com/fast4x/RiMusic/blob/master/LICENSE",
-    ),
-    LicenseEntry(
-        tag = "MIT",
-        title = "LRCLIB · MIT License",
-        subtitle = "by tranxuanthang · synchronized lyrics database",
-        url = "https://github.com/tranxuanthang/lrclib/blob/main/LICENSE",
-    ),
-    LicenseEntry(
-        tag = "MIT",
-        title = "AutoEq · MIT License",
-        subtitle = "by Jaakko Pasanen · headphone correction profiles",
-        url = "https://github.com/jaakkopasanen/AutoEq/blob/master/LICENSE",
     ),
 )
 
@@ -317,7 +214,7 @@ private fun ColumnScope.AboutSheetContent(
     Box(Modifier.fillMaxWidth()) {
         // zero-size layout places the spinning ring behind the top icon without pushing the column down
         VersionRing(
-            text = "MOCHY $installed",
+            text = "MUSIFY $installed",
             scrollProgress = { scrollState.value / ringScrollRangePx },
             modifier = Modifier
                 .align(Alignment.TopCenter)
@@ -370,7 +267,7 @@ private fun ColumnScope.AboutSheetContent(
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text = "Mochy Music | $installed",
+                    text = "Musify | $installed",
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = (-0.4).sp,
@@ -387,7 +284,7 @@ private fun ColumnScope.AboutSheetContent(
                     .padding(horizontal = 18.dp, vertical = 16.dp),
             ) {
                 Text(
-                    text = "Mochy Music is a music app but\nkinda cool.",
+                    text = "Musify is a music app but\nkinda cool.",
                     fontSize = 15.sp,
                     lineHeight = 19.sp,
                     fontWeight = FontWeight.Bold,
@@ -404,7 +301,7 @@ private fun ColumnScope.AboutSheetContent(
                     onClick = { popup.showSupportSheet() },
                 )
                 AboutPillRow(
-                    text = "Mochy Music github \u2192",
+                    text = "Musify github \u2192",
                     onClick = { context.openUrl(GithubRepoUrl) },
                 )
             }
@@ -431,32 +328,6 @@ private fun ColumnScope.AboutSheetContent(
                 }
             }
 
-            Spacer(Modifier.height(18.dp))
-            SectionHeader("we wont exist without these guys")
-            Spacer(Modifier.height(8.dp))
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(24.dp))
-                    .background(MenuRowSurface)
-                    .padding(vertical = 6.dp),
-            ) {
-                BaseCredits.forEach { credit ->
-                    PersonRow(
-                        name = credit.name,
-                        subtitle = credit.subtitle,
-                        avatarUrl = githubAvatarUrl(credit.githubUser),
-                        showArrow = false,
-                        onClick = { context.openUrl(credit.url) },
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(8.dp))
-            AndMoreRow(
-                avatars = remember { MoreCredits.take(3).map { githubAvatarUrl(it.githubUser) } },
-                onClick = { popup.showCreditsSheet() },
-            )
 
             Spacer(Modifier.height(18.dp))
             SectionHeader("License")

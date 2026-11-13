@@ -626,7 +626,7 @@ class ModuleRegistry @Inject constructor(
             val entry = service.metaData?.getString(EntryMetaKey) ?: return@mapNotNull null
             // its code runs inside mochy, so only an app signed with mochy's own key is let in
             if (pm.checkSignatures(context.packageName, pkg) != PackageManager.SIGNATURE_MATCH) {
-                Timber.tag(Tag).w("Skipping module $pkg: not signed like Mochy")
+                Timber.tag(Tag).w("Skipping module $pkg: not signed like Musify")
                 return@mapNotNull null
             }
             runCatching {
@@ -634,7 +634,7 @@ class ModuleRegistry @Inject constructor(
                 val loader = PathClassLoader(app.sourceDir, app.nativeLibraryDir, javaClass.classLoader)
                 val module = loader.loadClass(entry).getDeclaredConstructor().newInstance() as MochyModule
                 if (module.info.apiVersion != MODULE_API_VERSION) {
-                    Timber.tag(Tag).w("Skipping module $pkg: built for API ${module.info.apiVersion}, Mochy has $MODULE_API_VERSION")
+                    Timber.tag(Tag).w("Skipping module $pkg: built for API ${module.info.apiVersion}, Musify has $MODULE_API_VERSION")
                     null
                 } else module to ModuleOrigin.App(pkg)
             }.onFailure { Timber.tag(Tag).w(it, "Couldn't load module $pkg") }.getOrNull()

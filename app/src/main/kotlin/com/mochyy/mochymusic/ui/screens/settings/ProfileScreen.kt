@@ -303,7 +303,7 @@ fun ProfileScreen(navController: NavController) {
     val time = rememberRecapTime(running = !storyCovering, held = { profile.holdsPage || obscured.value })
     val measurer = rememberTextMeasurer()
     val giant = remember {
-        GiantTextState("MOCHY", filledRows = 0..0).apply { color = { lerp(HeaderText, StoryTextDark, expand) } }
+        GiantTextState("MUSIFY", filledRows = 0..0).apply { color = { lerp(HeaderText, StoryTextDark, expand) } }
     }
 
     // whether there's a recap waiting, so the pull hint can say so now and then
@@ -573,7 +573,7 @@ fun ProfileScreen(navController: NavController) {
                     ) {
                         // greeting (in the header; its scrolled-away twin lives in the top bar); on its side it heads the cards at the right
                         if (!landscape) Text(
-                            text = "${MochyGreeting.current}, ${accountName.ifBlank { "there" }}!",
+                            text = "${MusifyGreeting.current}, ${accountName.ifBlank { "there" }}!",
                             style = PageTitle,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -768,7 +768,7 @@ fun ProfileScreen(navController: NavController) {
                         if (landscape) {
                             Spacer(Modifier.height(statusBarTop + 30.dp))
                             Text(
-                                text = "${MochyGreeting.current}, ${accountName.ifBlank { "there" }}!",
+                                text = "${MusifyGreeting.current}, ${accountName.ifBlank { "there" }}!",
                                 style = PageTitle,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -845,7 +845,7 @@ fun ProfileScreen(navController: NavController) {
             // ---- logo, and the greeting sliding into the bar beside it ----
             Icon(
                 painter = painterResource(R.drawable.ic_mochy_mark),
-                contentDescription = "Mochy",
+                contentDescription = "Musify",
                 tint = Color.White,
                 modifier = Modifier
                     .padding(start = HomeContentInset, top = statusBarTop + TopBarLogoTop)
@@ -859,7 +859,7 @@ fun ProfileScreen(navController: NavController) {
             )
             if (collapseProgress > 0.01f) {
                 Text(
-                    text = "${MochyGreeting.current}, ${accountName.ifBlank { "there" }}!",
+                    text = "${MusifyGreeting.current}, ${accountName.ifBlank { "there" }}!",
                     style = PageTitle.copy(fontSize = 18.sp),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,

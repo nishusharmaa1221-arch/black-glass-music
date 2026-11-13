@@ -48,7 +48,7 @@
     <string name="song_edit_year">Year</string>
     <string name="song_edit_year_hint">Release year</string>
     <string name="song_edit_video">Video</string>
-    <string name="song_edit_video_auto">Found by Mochy</string>
+    <string name="song_edit_video_auto">Found by Musify</string>
     <string name="song_edit_video_picked">Picked by you</string>
     <string name="song_edit_video_none">No video</string>
     <string name="song_edit_saving">Saving…</string>
@@ -63,7 +63,7 @@
     <string name="video_pick_title">Select video</string>
     <string name="video_pick_subtitle">Wrong video? Or none?</string>
     <string name="video_pick_search">Search YouTube videos</string>
-    <string name="video_pick_auto">Let Mochy find it</string>
+    <string name="video_pick_auto">Let Musify find it</string>
     <string name="video_pick_auto_desc">The official video, when there is one</string>
     <string name="video_pick_none">No video</string>
     <string name="video_pick_none_desc">This song just shows its cover</string>

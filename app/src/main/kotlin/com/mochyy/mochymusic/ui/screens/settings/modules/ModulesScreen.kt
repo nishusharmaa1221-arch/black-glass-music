@@ -63,7 +63,7 @@ const val ModuleRoutePattern = "module/{id}"
 fun moduleRoute(id: String) = "module/$id"
 
 /** how to make a module, the guide on mochy's wiki */
-const val ModuleDocsUrl = "https://realidkroo.github.io/Mochy-Music/wiki/#modules-types"
+const val ModuleDocsUrl = "https://github.com/nishusharmaa1221-arch/musify"
 
 private val CardShape = RoundedCornerShape(26.dp)
 

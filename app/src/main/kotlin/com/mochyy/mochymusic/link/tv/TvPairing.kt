@@ -51,7 +51,7 @@ class TvPairing @Inject constructor(
     private fun accept(body: JSONObject, remoteHost: String, code: String): LinkResponse {
         val phoneId = body.optString("phoneId").ifBlank { return LinkResponse.status(400) }
         // a phone on the old protocol sends the key itself instead of a public half; it has to update first
-        val otherPublic = body.optString("pub").ifBlank { return LinkResponse.status(426, "update mochy on the phone") }
+        val otherPublic = body.optString("pub").ifBlank { return LinkResponse.status(426, "update Musify on the phone") }
         val keyPair = LinkAuth.newKeyPair()
         val key = LinkAuth.sharedKey(keyPair, otherPublic, code, listOf(phoneId, LinkIdentity.id(context))) ?: return LinkResponse.status(400)
         val phone = LinkedPhone(
