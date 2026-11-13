@@ -216,15 +216,25 @@ if ! has "$SONG_TITLE" && has "Import your local music here"; then
       dump || true
       tap_find "Add 1" || true
     fi
-    sleep 6
-    dump || true
+    # the import progress sheet opens and STAYS open (100%, "Create playlist")
+    # — it lists the song title, which would fool the play phase into tapping
+    # a dead row (run 6). Wait for it, then dismiss it by dragging it down.
+    for w in $(seq 1 10); do
+      dump || true
+      has "Import progress" && break
+      sleep 2
+    done
     shot after-import
-    # a progress sheet may show its own Done/Close — but never tap Done while
-    # the Add sheet itself is still open (that would cancel the import flow)
-    if ! has "Add music"; then
-      if has "Done"; then tap_find "Done" --exact || true; sleep 2; fi
-      if has "Close"; then tap_find "Close" --exact || true; sleep 2; fi
-    fi
+    for d in 1 2 3; do
+      dump || true
+      has "Import progress" || break
+      adb shell input swipe 540 1680 540 2350 300
+      sleep 1
+      dump || true
+      if has "Import progress"; then adb shell input keyevent 4; sleep 1; fi
+    done
+    dump || true
+    if has "Import progress"; then log "WARNING: progress sheet still open"; debug_snap; fi
   else
     log "WARNING: song not listed in Add music sheet"
     debug_snap
@@ -247,24 +257,28 @@ if ! has "$SONG_TITLE"; then
   shot library-songs
 fi
 
-if has "$SONG_TITLE"; then
+if has "$SONG_TITLE" && ! has "Import progress"; then
   log "song visible in library — tapping to play"
   tap_find "$SONG_TITLE" || true
   sleep 3
   dump || true
   shot after-tap-song
   adb shell dumpsys media_session 2>/dev/null | grep -a "PlaybackState\|position" | head -4 || true
-  # open full player: tap the mini-player (song title's LAST match = the bar)
-  tap_find "$SONG_TITLE" --last || true
-  sleep 3
-  dump || true
+  # If the bottom nav vanished, the full player is already open — don't tap
+  # the title again (could navigate away). Otherwise tap the mini-player bar
+  # (the title's LAST match) to expand the full player.
+  if has_desc_exact "Your Library"; then
+    tap_find "$SONG_TITLE" --last || true
+    sleep 3
+    dump || true
+  fi
   shot player-open
   sleep 3
   shot now-playing-1
   sleep 4
   shot now-playing-2
 else
-  log "WARNING: song not found in library UI"
+  log "WARNING: song not found in library UI (or progress sheet stuck)"
   debug_snap
 fi
 
