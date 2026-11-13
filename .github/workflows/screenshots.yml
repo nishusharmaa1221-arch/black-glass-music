@@ -1,0 +1,91 @@
+name: Real App Screenshots
+
+# Manual-only: boots an Android emulator in CI, installs the SHIPPED
+# v1.2.0 release APK, logs in with a throwaway Firebase test account,
+# plays a real local song and captures REAL screenshots of the app.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download shipped v1.2.0 APK (public release)
+        run: |
+          curl -fL -o musify.apk \
+            https://github.com/nishusharmaa1221-arch/musify/releases/download/v1.2.0/Musify-v1.2.0.apk
+          ls -la musify.apk
+          echo "APK_PATH=$GITHUB_WORKSPACE/musify.apk" >> "$GITHUB_ENV"
+
+      - name: Create throwaway Firebase test account
+        run: |
+          API_KEY=$(jq -r '.client[0].api_key[0].current_key' app/google-services.json)
+          EMAIL="ss.test.2026@gmail.com"
+          PASS=$(tr -dc 'A-Za-z0-9' </dev/urandom | head -c 14)
+          echo "::add-mask::$PASS"
+          RESP=$(curl -s -X POST \
+            "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${API_KEY}" \
+            -H 'Content-Type: application/json' \
+            -d "{\"email\":\"${EMAIL}\",\"password\":\"${PASS}\",\"returnSecureToken\":true}")
+          if ! echo "$RESP" | jq -e '.idToken' >/dev/null; then
+            ERR=$(echo "$RESP" | jq -r '.error.message // "unknown"')
+            echo "signUp failed ($ERR) - retrying with a unique email"
+            EMAIL="ss.test.${GITHUB_RUN_NUMBER:-x}.2026@gmail.com"
+            RESP=$(curl -s -X POST \
+              "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${API_KEY}" \
+              -H 'Content-Type: application/json' \
+              -d "{\"email\":\"${EMAIL}\",\"password\":\"${PASS}\",\"returnSecureToken\":true}")
+            echo "$RESP" | jq -e '.idToken' >/dev/null || { echo "signUp failed twice"; exit 1; }
+          fi
+          echo "Test account created (credentials kept in-job only)"
+          echo "SS_EMAIL=${EMAIL}" >> "$GITHUB_ENV"
+          echo "SS_PASS=${PASS}" >> "$GITHUB_ENV"
+
+      - name: Run app in emulator and capture screenshots
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis_playstore
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
+          script: bash .github/scripts/capture.sh
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: musify-real-screenshots
+          path: shots/
+          if-no-files-found: warn
+
+      - name: Delete throwaway test account
+        if: always()
+        run: |
+          if [ -z "${SS_EMAIL:-}" ] || [ -z "${SS_PASS:-}" ]; then
+            echo "No test credentials in env - nothing to clean up"
+            exit 0
+          fi
+          API_KEY=$(jq -r '.client[0].api_key[0].current_key' app/google-services.json)
+          TOKEN=$(curl -s -X POST \
+            "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}" \
+            -H 'Content-Type: application/json' \
+            -d "{\"email\":\"${SS_EMAIL}\",\"password\":\"${SS_PASS}\",\"returnSecureToken\":true}" \
+            | jq -r '.idToken // empty')
+          if [ -z "$TOKEN" ]; then
+            echo "Cleanup sign-in failed - account may already be gone"
+            exit 0
+          fi
+          curl -s -X POST \
+            "https://identitytoolkit.googleapis.com/v1/accounts:delete?key=${API_KEY}" \
+            -H 'Content-Type: application/json' \
+            -d "{\"idToken\":\"${TOKEN}\"}" >/dev/null
+          echo "Throwaway test account deleted"
