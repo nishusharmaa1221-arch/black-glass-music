@@ -202,17 +202,29 @@ if ! has "$SONG_TITLE" && has "Import your local music here"; then
   log "opening Add music sheet (device scan list)"
   tap_find "Import your local music here" || true
   if wait_for_text "$SONG_TITLE" 25; then
-    shot add-music-sheet
-    tap_find "Select all" || tap_find "$SONG_TITLE" || true
-    sleep 1
+    sleep 2   # let the sheet finish sliding up
     dump || true
-    if tap_find "Add 1" || tap_find "Add"; then log "import started"; fi
+    shot add-music-sheet
+    # NOTE: the sheet opens with every found song PRE-SELECTED (run 5 proof:
+    # header read "Select none", button "Add 1 song"). Tapping the row would
+    # DESELECT it. Just press the Add button; fall back to Select all once.
+    if tap_find "Add 1"; then
+      log "import started (pre-selected)"
+    else
+      tap_find "Select all" || true
+      sleep 1
+      dump || true
+      tap_find "Add 1" || true
+    fi
     sleep 6
     dump || true
     shot after-import
-    # progress sheet may need dismissing
-    if has "Done"; then tap_find "Done" --exact || true; sleep 2; fi
-    if has "Close"; then tap_find "Close" --exact || true; sleep 2; fi
+    # a progress sheet may show its own Done/Close — but never tap Done while
+    # the Add sheet itself is still open (that would cancel the import flow)
+    if ! has "Add music"; then
+      if has "Done"; then tap_find "Done" --exact || true; sleep 2; fi
+      if has "Close"; then tap_find "Close" --exact || true; sleep 2; fi
+    fi
   else
     log "WARNING: song not listed in Add music sheet"
     debug_snap
