@@ -365,19 +365,12 @@ dependencies {
     implementation(libs.hilt.navigation)
     implementation(libs.datastore)
 
-    // Musify accounts (Firebase Auth + Firestore for unique usernames)
+    // Musify accounts: Firebase Auth only. Unique usernames live in Firestore but are
+    // claimed over its REST API from the login screen — the Firestore Android SDK drags
+    // in protolite/grpc protobuf copies that duplicate this app's protobuf-javalite.
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-common")
-    // protolite-well-known-types is excluded above (it embeds protobuf classes that
-    // duplicate the app's protobuf-javalite); Firestore still needs com.google.rpc /
-    // com.google.type from here instead
-    implementation("com.google.api.grpc:proto-google-common-protos:2.81.0")
-    implementation("com.google.firebase:firebase-firestore") {
-        // protolite bundles protobuf classes that clash with the app's own
-        // protobuf-javalite (which already carries the well-known types)
-        exclude(group = "com.google.firebase", module = "protolite-well-known-types")
-    }
 
     implementation(libs.compose.runtime)
     // the profiling build names every composable in system traces, so a slow frame says what it was

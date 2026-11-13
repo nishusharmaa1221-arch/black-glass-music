@@ -62,6 +62,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
+import android.os.Handler
+import android.os.Looper
+import java.net.HttpURLConnection
+import java.net.URL
+import java.time.Instant
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
@@ -69,7 +74,6 @@ import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.UserProfileChangeRequest
-import com.google.firebase.firestore.FirebaseFirestore
 
 object BlackGlassAuth {
     fun isLoggedIn(context: Context): Boolean =
@@ -102,13 +106,38 @@ private fun authErrorMessage(e: Exception, createMode: Boolean): String = when (
     else -> "Kuch gadbad ho gayi — dobara try karo"
 }
 
+
+// ---- Firestore over REST (no Firestore SDK — see build.gradle.kts note) ----
+
+private const val FirestoreBase =
+    "https://firestore.googleapis.com/v1/projects/musify-f5f88/databases/(default)/documents"
+
+private fun String.jsonEsc(): String = replace("\\", "\\\\").replace("\"", "\\\"")
+
+private fun firestoreRequest(method: String, urlStr: String, token: String?, body: String?): Int {
+    val conn = URL(urlStr).openConnection() as HttpURLConnection
+    try {
+        conn.requestMethod = method
+        conn.connectTimeout = 15000
+        conn.readTimeout = 15000
+        if (token != null) conn.setRequestProperty("Authorization", "Bearer $token")
+        if (body != null) {
+            conn.doOutput = true
+            conn.setRequestProperty("Content-Type", "application/json")
+            conn.outputStream.use { it.write(body.toByteArray(Charsets.UTF_8)) }
+        }
+        return conn.responseCode
+    } finally {
+        conn.disconnect()
+    }
+}
+
 @Composable
 fun BlackGlassLoginScreen(
     onLoggedIn: () -> Unit,
 ) {
     val context = LocalContext.current
     val auth = remember { FirebaseAuth.getInstance() }
-    val db = remember { FirebaseFirestore.getInstance() }
 
     var createMode by remember { mutableStateOf(false) }
     var username by remember { mutableStateOf("") }
@@ -161,44 +190,87 @@ fun BlackGlassLoginScreen(
         loading = true
         error = null
         info = null
-        // Claim the username first: if the doc exists, the name is taken.
-        db.collection("usernames").document(uname).get()
-            .addOnSuccessListener { snap ->
-                if (snap.exists()) {
-                    fail("Ye username pehle se liya gaya hai — koi dusra chuno")
-                } else {
-                    auth.createUserWithEmailAndPassword(em, password)
-                        .addOnSuccessListener { result ->
-                            val uid = result.user?.uid
-                            runCatching {
-                                result.user?.updateProfile(
-                                    UserProfileChangeRequest.Builder()
-                                        .setDisplayName(uname)
-                                        .build()
-                                )
+        // Step 1: is the username free? (usernames are public-read in the rules)
+        val mainHandler = Handler(Looper.getMainLooper())
+        Thread {
+            val checkCode = runCatching {
+                firestoreRequest("GET", "$FirestoreBase/usernames/$uname", null, null)
+            }.getOrDefault(-1)
+            mainHandler.post {
+                when {
+                    checkCode == 200 ->
+                        fail("Ye username pehle se liya gaya hai — koi dusra chuno")
+                    checkCode != 404 ->
+                        fail("Server se connect nahi ho paya — internet check karke dobara try karo")
+                    else -> {
+                        // Step 2: create the account
+                        auth.createUserWithEmailAndPassword(em, password)
+                            .addOnSuccessListener { result ->
+                                val user = result.user
+                                runCatching {
+                                    user?.updateProfile(
+                                        UserProfileChangeRequest.Builder()
+                                            .setDisplayName(uname)
+                                            .build()
+                                    )
+                                }
+                                val uid = user?.uid
+                                if (user == null || uid == null) {
+                                    onLoggedIn()
+                                    return@addOnSuccessListener
+                                }
+                                // Step 3: claim the username + save the profile (REST, with his ID token)
+                                user.getIdToken(false)
+                                    .addOnSuccessListener { tokenResult ->
+                                        Thread {
+                                            val now = Instant.now().toString()
+                                            val unameBody =
+                                                "{\"fields\":{\"uid\":{\"stringValue\":\"" + uid.jsonEsc() +
+                                                    "\"},\"email\":{\"stringValue\":\"" + em.jsonEsc() +
+                                                    "\"},\"createdAt\":{\"timestampValue\":\"" + now + "\"}}}"
+                                            val claimCode = runCatching {
+                                                firestoreRequest(
+                                                    "POST",
+                                                    "$FirestoreBase/usernames?documentId=$uname",
+                                                    tokenResult.token,
+                                                    unameBody
+                                                )
+                                            }.getOrDefault(-1)
+                                            when (claimCode) {
+                                                200 -> {
+                                                    val userBody =
+                                                        "{\"fields\":{\"username\":{\"stringValue\":\"" + uname.jsonEsc() +
+                                                            "\"},\"email\":{\"stringValue\":\"" + em.jsonEsc() +
+                                                            "\"},\"createdAt\":{\"timestampValue\":\"" + now + "\"}}}"
+                                                    runCatching {
+                                                        firestoreRequest(
+                                                            "POST",
+                                                            "$FirestoreBase/users?documentId=$uid",
+                                                            tokenResult.token,
+                                                            userBody
+                                                        )
+                                                    }
+                                                    mainHandler.post { onLoggedIn() }
+                                                }
+                                                // someone grabbed the name between check and claim:
+                                                // remove the orphan account so the email stays usable
+                                                409 -> {
+                                                    runCatching { user.delete() }
+                                                    mainHandler.post {
+                                                        fail("Ye username pehle se liya gaya hai — koi dusra chuno")
+                                                    }
+                                                }
+                                                else -> mainHandler.post { onLoggedIn() }
+                                            }
+                                        }.start()
+                                    }
+                                    .addOnFailureListener { onLoggedIn() }
                             }
-                            if (uid != null) {
-                                val batch = db.batch()
-                                batch.set(
-                                    db.collection("usernames").document(uname),
-                                    mapOf("uid" to uid, "email" to em)
-                                )
-                                batch.set(
-                                    db.collection("users").document(uid),
-                                    mapOf("username" to uname, "email" to em)
-                                )
-                                batch.commit()
-                                    .addOnCompleteListener { onLoggedIn() }
-                            } else {
-                                onLoggedIn()
-                            }
-                        }
-                        .addOnFailureListener { e -> fail(authErrorMessage(e, createMode = true)) }
+                            .addOnFailureListener { e -> fail(authErrorMessage(e, createMode = true)) }
+                    }
                 }
             }
-            .addOnFailureListener {
-                fail("Server se connect nahi ho paya — internet check karke dobara try karo")
-            }
+        }.start()
     }
 
     fun doForgotPassword() {
