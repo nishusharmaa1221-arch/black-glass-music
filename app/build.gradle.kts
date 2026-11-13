@@ -11,6 +11,7 @@ if (localPropertiesFile.exists()) {
 }
 plugins {
     id("com.android.application")
+    id("com.google.gms.google-services") version "4.4.3"
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.compose.compiler)
@@ -27,8 +28,8 @@ extensions.configure<ApplicationExtension> {
         applicationId = "com.mochyy.mochymusic"
         minSdk = 24
         targetSdk = 36
-        versionCode = 73
-        versionName = "8.3.2 build#1243"
+        versionCode = 74
+        versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -363,6 +364,11 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.hilt.navigation)
     implementation(libs.datastore)
+
+    // Musify accounts (Firebase Auth + Firestore for unique usernames)
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
 
     implementation(libs.compose.runtime)
     // the profiling build names every composable in system traces, so a slow frame says what it was
